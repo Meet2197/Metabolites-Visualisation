@@ -44,10 +44,10 @@ P = round((ODE_stats$Phospholipids_in_HDL) , 2)
 ode_system <- function(t, state, params) {
   with(as.list(c(state, params)), {
     dVdt <- k1 * (C_V + T_V + E_V) * B - k2 * V
-    dIdt <- k3 * 0.57 * dVdt - k4 * I
-    dLdt <- k5 * dIdt * 0.5 - k6 * L * 0.5
+    dIdt <- k3 * 0.60 * V - k4 * I
+    dLdt <- k5 * I * 0.5 - k6 * L
     dHdt <- k7 * 0.7 * A1 * (C_H + P) - k8 * 0.3 * A1 * H
-    dAdt <- k7 * 0.7 * A1 * (C_H + P) + k9 * dHdt 
+    dAdt <- k7 * 0.7 * A1 * (C_H + P) + k9 * H 
     dC_Vdt <- 0  # Add equations for the other variables
     dT_Vdt <- 0
     dE_Vdt <- 0
