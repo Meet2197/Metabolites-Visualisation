@@ -1,3 +1,5 @@
+# Libraries to support different functions in this file. 
+
 library(dplyr)
 library(tidyr)
 library(data.table)
@@ -21,7 +23,6 @@ setnames(df22, old=colnames(df22), new = c('No.','Eid','Total_Cholesterol','Tota
 setnames(data3,old=colnames(data3), new = c('X','Id',"Liver_fat"))
 
 ## 1.4 Metabolites
-
 
 common4 <- intersect(df4$Eid, df22$Eid)
 df4_common = df4[common3, ]

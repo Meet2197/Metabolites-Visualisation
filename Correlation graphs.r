@@ -1,9 +1,12 @@
+
+# Dataset from NASH_df, MAFLD and healthy Patients dataframes merged with sub metabolites mentioned.  
+
 combined_data <- rbind(
   mutate(Nash, Data_Frame = "NASH_df"),
   mutate(MAFLD, Data_Frame = "MAFLD"),
   mutate(Healthy_Patient, Data_Frame = "healthy_df"))
 
-# Create the scatter plot with different colors for LDL variables
+# Create the scatter plot with different colors for different variables with ggplot. 
 
 ggplot(combined_data, aes(x = Data_Frame, y = Re_C, color = "Re_C")) +
   geom_jitter(width = 0.2) +

@@ -1,13 +1,14 @@
-# Load required packages and libraries if not already loaded
+# Packages are loaded below. DeSolve provides support for ODE calculation and Plotly is used for innovative graphs.  
 
 library(deSolve)
 library(plotly)
 
-# Define the selected columns you want to work with in your dataset
+# the selected columns you want to work with in metabolites dataset. 
 
 "L_HDL,M_HDL,L_VLDL,VS_VLDL,IDL,S_LDL,CE_VL_HDL,TG_HDL,VLDL_C,CE_HDL,Total_TG,Total_C,HDL_C,TG_VLDL,CE_VL_VLDL"
 
-# this columns are selected Metabolites from Metabolites. r file. This file have dataframe names metabolites and df3. We took merged data of df3. 
+# this columns are selected sub-Metabolites from Metabolites dataframe from Metabolites.R file. This file have dataframe names metabolites and df3. We took merged data of df3. 
+# Mentioned Metabolites have association with exogenous lipoprotein pathway in liver. 
 
 selected_columns <- df3 %>%
   select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Total_Esterified_C', 'Total_TG', 'Total_C', 'Apo_B','Apo_A1','Phospholipids_in_HDL')
@@ -17,7 +18,7 @@ selected_columns <- df3 %>%
 ODE_stats <- selected_columns %>%
   summarise(across(.fns = mean))
 
-# Access other metabolite solutions
+# Sub-metabolites calculations are depicted below. calculations of sub metabolites has been provided.
 
 H = round((ODE_stats$L_HDL + ODE_stats$M_HDL) , 2)
 V = round((ODE_stats$L_VLDL + ODE_stats$VS_VLDL) , 2)
@@ -39,8 +40,9 @@ B = round((ODE_stats$Apo_B) , 2)
 A1 = round((ODE_stats$Apo_A1) , 2)
 P = round((ODE_stats$Phospholipids_in_HDL) , 2)
 
-# Extract initial state values from ODE_table
-
+# ODE system df Extracts initial state values from ODE_table. This ODE system dataframe calculates ODE equation written. 
+# This equation provides calculations of VLDL, IDL, LDL, HDL, Apo A1, Apo B metabolits for VLDL synthesis.   
+ 
 ode_system <- function(t, state, params) {
   with(as.list(c(state, params)), {
     dVdt <- k1 * (C_V + T_V + E_V) * B - k2 * V
@@ -60,7 +62,7 @@ ode_system <- function(t, state, params) {
   })
 }
 
-# Set initial conditions and parameters
+# Set initial conditions(from metabolites dataframe) and parameters(constant values)
 
 initial_state <- c(H , V , I , L , A1, C_V , T_V , E_V , C_H , T_H , E_H , B , P)
 parameters <- c(k1 = 1.0, k2 = 1.0, k3 = 1.0, k4 = 1.0, k5 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0 )
@@ -121,7 +123,7 @@ meatbolism_plot <- data.frame(Time = times,
 
 meatbolism_plot1 <- tidyr::pivot_longer(meatbolism_plot, cols = -Time, names_to = "Variable", values_to = "Value")
 
-# Create a grouped bar plot
+# Create a grouped bar plot for Metabolites secretion by using ggplot function. 
 
 ggplot(meatbolism_plot1, aes(x = Variable, y = Value, fill = Variable)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
@@ -139,7 +141,8 @@ particle_size_distribution <- function(t, state, parameters1) {
   dHdt <- parameters1$k7 * 0.7 * state$A1 * (state$C_H + state$P) - parameters1$k8 * 0.3 * state$A1 * state$H
   dAdt <- parameters1$k7 * 0.7 * state$A1 * (state$C_H + state$P) + parameters1$k9 * dHdt
   
-  # Coefficients for the particle size distribution
+# Coefficients for the particle size distribution
+
   alpha1 <- parameters1$alpha1
   alpha2 <- parameters1$alpha2
   alpha3 <- parameters1$alpha3
@@ -182,6 +185,7 @@ result <- particle_size_distribution(0, initial_state, parameters1)
 dPSDdt_values <- result$dPSDdt
 
 # Create a data frame for plotting
+
 plot_data <- data.frame(PSD = dPSDdt_values)
 
 # Create the time series plot without the time variable

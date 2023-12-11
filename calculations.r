@@ -6,13 +6,13 @@ df7 = df5[df5$icd_group =='K71.0',] %>%
   select('Age','Sex','BMI','Ethnicity','Medications_1','Medications_2','Medications_3','Medications_4','Medications_5','Medications_6','Medications_7','Medications_8','Medications_9','Medications_10','Medications_11','Medications_12','Medications_13','Medications_14','Medications_15','Medications_16','Medications_17','Medications_18','Medications_19')
 medication_group = medication_group[!duplicated(medication_group), ]
 
-# BMI
+# BMI as Patient Parameter
 
 df7[df7$BMI > 18.5 & df7$BMI <= 25, "BMI_group"] <- "18.5-25"
 df7[df7$BMI > 25 & df7$BMI <= 30, "BMI_group"] <- "25-30"
 df7[df7$BMI > 30, "BMI_group"] <- "> 30"
 
-# Age 
+# Age as Patient Parameter
 
 df7[df7$Age <= 12, "age_group"] <- "0-12"
 df7[df7$Age > 13 & df7$Age <= 19, "age_group"] <- "13-19"
@@ -26,7 +26,8 @@ df7[df7$Age > 65, "age_group"] <- "> 65"
 Hepa = df5%>%
   select('Eid_1','diag_icd10','Total_Free_C','Liver_fat','HDL_C','Total_Triglycerides','Clinical_LDL_C','icd_group')
 
-# 'ALAT','ASAT','GGT',
+# 'ALAT','ASAT','GGT' enzymes for 
+
 max(Hepa$Concentration_of_HDL, na.rm = TRUE)
 Hepa1 = filter(Hepa, Total_Triglycerides < 1.5, )
 Hepa1 = Hepa1[!duplicated(Hepa1), ]
@@ -39,17 +40,17 @@ Hepa_T = subset(Hepa,Liver_fat < 5 & HDL_C < 1.55 & Clinical_LDL_C < 2.6 & Total
 
 
 
-# Removing Disease specific codes
+# Extracting Disease specific codes
 Hepa_T <- subset(Hepa, !(icd_group %in% c("K70.0", "K71.0", "K72.0", "K73.0", "K74.0", "K75.0", "K76.0", "K77.0","C22.0")))
 Hepa_T = Hepa_T[!duplicated(Hepa_T), ]
 
 
-# Mean values
+# Mean values from Healthy Patients df 
 Hepa_T_mean <- colMeans(Hepa_T[, c(3, 4, 5, 6, 7, 8, 9)])
 
-# 1. Standrad deviation Min and Max Values
-
+# 1. Standard deviation Min and Max Values
 # calculate summary statistics for each column
+
 metabolites2 <- metabolites %>%
   select('Total_C','Total_C-HDL_C','Remnant_C','VLDL_C','Clinical_LDL_C','LDL_C','HDL_C','Total_Triglycerides','Triglycerides_in_VLDL', 'Triglycerides_in_LDL','Triglycerides_in_HDL','Total_Phospholipids_in_Lipoprotein','Phospholipids_in_VLDL', 'Phospholipids_in_LDL','Phospholipids_in_HDL','Total_Esterified_C', 'Cholesteryl_Esters_in_VLDL','Cholesteryl_Esters_in_LDL','Cholesteryl_Esters_in_HDL','Total_Free_C','FC_in_VLDL','FC_in_LDL','FC_in HDL', 'Total Lipids in Lipoprotein ', 'Total Lipids in VLDL','Total Lipids in LDL','Total Lipids in HDL','Total  Lipoprotein ','VLDL','LDL','Concentration_of_HDL','Average Diameter for VLDL ','Average Diameter for LDL ,Average Diameter for HDL_','Phosphoglycerides','Triglycerides_to_Phosphoglycerides ratio','Total_Cholines','Phosphatidylcholines','Sphingomyelins','Apolipoprotein_B','Apolipoprotein_A1','Apolipo protein B-Apolipoprotein A1 ratio',
          'Total_Fatty_Acids','Degree of Unsaturation','Omega-3 Fatty_Acids','Omega-6_Fatty_Acids','Polyunsaturated_Fatty_Acids','Monounsaturated_Fatty_Acids','Saturated_Fatty_Acids','Linoleic_Acid','DHA','Omega-3_Fatty_Acids_to_Total_Fatty_Acids_percentage','Omega-6 Fatty Acids to Total Fatty Acids percentage','Polyunsaturated Fatty Acids to Total Fatty Acids percentage','Monounsaturated Fatty Acids to Total Fatty Acids percentage','Saturated Fatty Acids to Total Fatty Acids percentage','Linoleic Acid to Total Fatty Acids percentage','Docosahexaenoic Acid to Total Fatty Acids percentage','Polyunsaturated Fatty Acids to Monounsaturated Fatty Acids ratio','Omega-6 Fatty Acids to Omega-3 Fatty Acids ratio','Alanine','Glutamine','Glycine','Histidine','Total  Branched-Chain Amino Acids (Leucine + Isoleucine + Valine)','Isoleucine','Leucine','Valine','Phenylalanine','Tyrosine','Glucose','Lactate','Pyruvate','Citrate','3-Hydroxybutyrate','Acetate','Acetoacetate','Acetone','Creatinine','Albumin','Glycoprotein Acetyls','	 Chylomicrons and EL_VLDL ','Total Lipids in Chylomicrons and EL_VLDL',
@@ -66,6 +67,7 @@ HepaT = Hepa_T%>%
   select('Eid_1','diag_icd10','Total_Free_C','Liver_fat','HDL_C','Total_Triglycerides','Clinical_LDL_C')
 
 # 'ALAT','ASAT','GGT'
+
 summary_table <- data.frame(
   Variables = names(metabolites),
   Mean = round(colMeans(metabolites, na.rm = TRUE), 2),
@@ -94,8 +96,7 @@ Hepa_TT_summary <- data.frame(
   median = round(apply(Hepa_TT, 2, median, na.rm = TRUE), 2),
   Q3 = round(apply(Hepa_TT, 2, quantile, probs = 0.75, na.rm = TRUE), 2),
   max = round(apply(Hepa_TT, 2, max, na.rm = TRUE), 2),
-  mean = round(apply(Hepa_TT, 2, mean, na.rm = TRUE), 2)
-)
+  mean = round(apply(Hepa_TT, 2, mean, na.rm = TRUE), 2))
 
 #Non Medications Group
 
