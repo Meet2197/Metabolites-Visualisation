@@ -8,10 +8,10 @@ library(plotly)
 "L_HDL,M_HDL,L_VLDL,VS_VLDL,IDL,S_LDL,CE_VL_HDL,TG_HDL,VLDL_C,CE_HDL,Total_TG,Total_C,HDL_C,TG_VLDL,CE_VL_VLDL"
 
 # this columns are selected sub-Metabolites from Metabolites dataframe from Metabolites.R file. This file have dataframe names metabolites and df3. We took merged data of df3. 
-# Mentioned Metabolites have association with exogenous lipoprotein pathway in liver. 
+# Mentioned Metabolites have association with exogenous lipo-protein pathway in liver. 
 
-selected_columns <- df3 %>%
-  select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Total_Esterified_C', 'Total_TG', 'Total_C', 'Apo_B','Apo_A1','Phospholipids_in_HDL')
+selected_columns <- df6 %>%
+  select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL')
 
 # Calculate the mean values for selected columns
 
@@ -33,12 +33,12 @@ C_H = round((ODE_stats$HDL_C) , 2)
 T_I = round((ODE_stats$TG_IDL) , 2)
 E_I = round((ODE_stats$CE_IDL) , 2)
 C_I = round((ODE_stats$C_IDL) , 2) 
-C = round((ODE_stats$Total_C) , 2) 
-T = round((ODE_stats$Total_TG) , 2)  
-E = round((ODE_stats$Total_Esterified_C) , 2)
+C = round((ODE_stats$Tl_C) , 2) 
+T = round((ODE_stats$Tl_TG) , 2)  
+E = round((ODE_stats$Tl_Esterified_C) , 2)
 B = round((ODE_stats$Apo_B) , 2)
 A1 = round((ODE_stats$Apo_A1) , 2)
-P = round((ODE_stats$Phospholipids_in_HDL) , 2)
+P = round((ODE_stats$P_HDL) , 2)
 
 # ODE system df Extracts initial state values from ODE_table. This ODE system dataframe calculates ODE equation written. 
 # This equation provides calculations of VLDL, IDL, LDL, HDL, Apo A1, Apo B metabolits for VLDL synthesis.   
@@ -155,7 +155,7 @@ particle_size_distribution <- function(t, state, parameters1) {
   return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dPSDdt)))
 }
 
-# Example usage
+# Example usage of ODE equation with metabolites. 
 
 initial_state <- list(
   V = round((ODE_stats$L_VLDL + ODE_stats$VS_VLDL), 2),
@@ -184,7 +184,7 @@ result <- particle_size_distribution(0, initial_state, parameters1)
 
 dPSDdt_values <- result$dPSDdt
 
-# Create a data frame for plotting
+# Dataframe generation for plotting particle_size_distribution
 
 plot_data <- data.frame(PSD = dPSDdt_values)
 
