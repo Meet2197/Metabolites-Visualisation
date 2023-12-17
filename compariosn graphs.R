@@ -27,7 +27,7 @@ whisker_data1 <- combined_data2 %>%
 
 whisker_data2 <- as_tibble(whisker_data1)
 
-# 2.5 box plot with whiskers
+# 2.5 box plot with whiskers of Metabolites
 ggplot() +
   geom_boxplot(data = combined_data2, aes(x = Dataframe, y = Cl_LDL_C)) +
   geom_errorbar(data = whisker_data2, aes(x = Dataframe, ymin = lower_whisker, ymax = upper_whisker), width = 0.2, color = "red") +

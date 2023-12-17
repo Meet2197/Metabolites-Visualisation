@@ -1,3 +1,5 @@
+# Libraries to upload file for data modifications, generating data table, plotting the data. 
+
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -55,7 +57,7 @@ setnames(NASH,"X41202.0.0","icd_code")
 setnames(K760,"K760","Diagnosis")
 
 
-#sapply(data2$epistart, typeof), class(data2$epistart)
+# sapply(data2$epistart, typeof), class(data2$epistart)
 
 hesin$epistart <- dmy(hesin$epistart)
 hesin$epiend <- dmy(hesin$epiend)
@@ -67,13 +69,19 @@ hesin$disdate <- dmy(hesin$disdate)
 hesin$epi_diff = difftime(hesin$epiend,hesin$epistart,units = "days")
 hesin$admi_diff = difftime(hesin$disdate,hesin$admidate,units = "days")
 
+# creating round of values of metabolites and diabetes. 
+
 metabolites <- round(na.omit(metabolites) , 3)
 covariates <- na.omit (covariates)
 mri <- na.omit(mri)
 diabetes <- na.omit(diabetes)
 
+# Sellectign columns form admissionP dataframe. 
+
 admissionP <- na.omit(hesin) %>%
   select("eid","admidate")
+
+# death info consists several columns mentioned below for MAFLD and NASH associated death.  
 
 death_info <- na.omit(df6) %>%
   select("eid_1","date_of_death", "icd_group","icd_names")
@@ -97,6 +105,8 @@ df2_common = df1[common2, ]
 metabolites_common = metabolites[common2, ]
 df2 = merge(df1, metabolites, by.x=c('eid_1'), by.y=c('Eid')) %>%
   select('eid_1','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Total_Esterified_C', 'Total_TG', 'Total_C', 'Apo_B','Apo_A1','Phospholipids_in_HDL','diag_icd10','icd_group')
+
+# NASH icd code comaprison with Sub metabolites. 
 
 Nash = merge(NASH, metabolites, by.x=c('eid'), by.y=c('Eid')) %>%
   select('eid','icd_code','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Total_Esterified_C', 'Total_TG', 'Total_C', 'Apo_B','Apo_A1','Phospholipids_in_HDL')
@@ -122,7 +132,7 @@ Fibrosis_cirrhosis <- df2[df2$icd_group == 'K74.0' & !is.na(df2$icd_group), ]
 neoplasm <- df2[df2$icd_group == 'C22.0' & !is.na(df2$icd_group), ]
 no_liver_disease <- df2[!(df2$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0')), ]
 
-# Nash (K75.8)
+# Nash (K75.8) dataframe with metabolites columns to observe impact over NASH development.  
 
 NASH_dataframe <- intersect(NASH$eid, metabolites$Eid)
 nash_common = NASH[NASH_dataframe, ]
@@ -130,6 +140,8 @@ metabolites_common = metabolites[NASH_dataframe, ]
 NASH_dataframe = merge(NASH,metabolites, by.x=c('eid'), by.y=c('Eid'))%>% 
   select('eid','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Total_Esterified_C', 'Total_TG', 'Total_C', 'Apo_B','Apo_A1','Phospholipids_in_HDL')
 NASH_df = NASH_dataframe[!duplicated(NASH_dataframe), ]
+
+# No medication Dataframe generated in calculations.R file with no usage of medications for NASH and MAFLD patients. 
 
 common4 <- intersect(df2$eid_1, No_Medication$eid)
 df4_common = df2[common4, ]
@@ -141,7 +153,7 @@ healthy_df = healthy_df[!duplicated(healthy_df), ]
 metformin_df = metformin_df[!duplicated(metformin_df), ]
 count(metformin_df)
 
-## 1.2 Metabolites
+## 1.2 Metabolites dataframe generation. 
 
 common3 <- intersect(df2$eid_1, medication$eid)
 df3_common = df2[common3, ]
@@ -149,24 +161,28 @@ medication_common = medication[common3, ]
 df3 = merge(medication, df2, by.x=c('eid'), by.y=c('eid_1')) %>%
   select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Total_Esterified_C', 'Total_TG', 'Total_C', 'Apo_B','Apo_A1','Phospholipids_in_HDL','diag_icd10','icd_group')
 
+## 1.3 covariates file include baseline with itersect with df3. 
+
 common4 <- intersect(df3$Eid, covariates$Eid_1)
 df3_common = df3[common4, ]
 covariates_common = covariates[common4, ]
 df4 = merge(covariates, df3, by.x=c('Eid_1'), by.y=c('Eid'))
 
-## 1.3 MRI data 
+## 1.4 MRI data intersect df3.
 
 common5 <- intersect(df4$Eid_1 , mri$eid)
 df4_common = df4[common5, ]
 mri_common = mri[common5,]
 df5 = merge(df3, mri, by.x=c('Eid_1'), by.y=c('eid'))
 
-## 1.5 Death cause
+## 1.5 Death cause and death dataframe intersect to observe cause of NAFLD and MAFLD. 
 
 common6 <- intersect(death$eid , death_cause$eid)
 death_common = death[common6, ]
 death_cause_common = death_cause[common6,]
 df6 = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
+
+## 1.7 Genes file intersect with df6. 
 
 common7 <- intersect(df6$eid_1, genes$eid)
 death_genetic_common = df6[common7, ]

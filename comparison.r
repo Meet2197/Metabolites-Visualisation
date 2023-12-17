@@ -1,9 +1,12 @@
 # 1.1 Extract specific variables from each dataframe (LDL Comparison)
+
 S_VLDL <- healthy_df$S_VLDL
 L_LDL <- metformin_filtered_df$L_LDL
 M_LDL <- NASH_1$M_LDL
 
-# Create a combined dataframe
+# Create a combined dataframe of Metabolites with "Healthy", "Metformin Filtered", "NASH", "MAFLD" datasets.  
+# combined data = "Healthy", "Metformin Filtered", "NASH", "MAFLD" dataframes mentioned
+
 comparison_data20 <- data.frame(
   Variables = rep(c("S_VLDL", "L_LDL", "M_LDL"), each = 4),
   Category = rep(c("Healthy", "Metformin Filtered", "NASH", "MAFLD"), times = 3),
@@ -17,7 +20,8 @@ comparison_data20 <- data.frame(
   Q3 = c(quantile(S_VLDL, 0.75), quantile(L_LDL, 0.75), quantile(M_LDL, 0.75))
 )
 
-# Plotting the whisker box plot
+# Plotting the whisker box plot of comparing one major metabolite with other sub-metabolites 
+
 ggplot(combined_data, aes(x = Category, y = Mean, fill = Variables)) +
   geom_boxplot() +
   geom_errorbar(aes(ymin = Min, ymax = Max), width = 0.2, color = "red") +
@@ -29,15 +33,19 @@ ggplot(combined_data, aes(x = Category, y = Mean, fill = Variables)) +
   ggtitle("LDL Comparison(S_VLDL,L_LDL,M_LDL)") +
   scale_fill_manual(values = c("S_VLDL" = "lightblue", "L_LDL" = "lightgreen", "M_LDL" = "lightyellow"))
 
+# Co-relation of two different Statstical overview of one metabolite
 
 correlation1 <- cor(combined_data$Mean, combined_data$Median)
 correlation2 <- cor(combined_data$SD, combined_data$IQR)
 correlation3 <- cor(combined_data$Min, combined_data$Max)
 
-# Perform linear regression
+# Perform linear regression of Combined dataset of 
+
 regression1 <- lm(Mean ~ Median, data = combined_data)
 regression2 <- lm(SD ~ IQR, data = combined_data)
 regression3 <- lm(Min ~ Max, data = combined_data)
+
+# ggplot combined data 
 
 ggplot(combined_data, aes(x = Median, y = Mean)) +
   geom_point(aes(fill = Variables), shape = 23, size = 3) +
@@ -51,6 +59,7 @@ ggplot(combined_data, aes(x = Median, y = Mean)) +
 
 
 # Plotting the whisker box plot with correlation and regression lines
+
 ggplot(combined_data, aes(x = Category, y = Mean, fill = Variables)) +
   geom_boxplot() +
   geom_errorbar(aes(ymin = Min, ymax = Max), width = 0.2, color = "red") +
@@ -77,7 +86,8 @@ VLDL_C <- metformin_filtered_df$VLDL_C
 Re_C <- NASH_1$Re_C
 Tl_C <- MAFLD$Tl_C
 
-# Create a combined dataframe
+# Create a combined dataframe with variables to compare 
+
 comparison_data3 <- data.frame(
   Variables = rep(c("LDL_C", "VLDL_C", "Re_C", "Tl_C"), each = 4),
   Category = rep(c("Healthy", "Metformin Filtered", "NASH", "MAFLD"), times = 4),
@@ -91,7 +101,8 @@ comparison_data3 <- data.frame(
   Q3 = c(quantile(LDL_C, 0.75), quantile(VLDL_C, 0.75), quantile(Re_C, 0.75), quantile(Tl_C, 0.75))
 )
 
-# Plotting the whisker box plot
+# Plotting the whisker box plot of dataframes
+
 ggplot(comparison_data3, aes(x = Category, y = Mean, fill = Variables)) +
   geom_boxplot() +
   geom_errorbar(aes(ymin = Min, ymax = Max), width = 0.2, color = "red") +
