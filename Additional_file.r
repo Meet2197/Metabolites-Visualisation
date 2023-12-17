@@ -22,7 +22,7 @@ setnames(df22, old=colnames(df22), new = c('No.','Eid','Total_Cholesterol','Tota
                                            'Cholesteryl Esters in VL_HDL','Free Cholesterol in VL_HDL','Triglycerides in_VL_HDL','Concentration of L_HDL_Particles','Total Lipids in L_HDL','Phospholipids in L_HDL','Cholesterol in L_HDL','Cholesteryl Esters in L_HDL','Free Cholesterol in L_HDL','Triglycerides in L_HDL','Concentration of M_HDL_Particles','Total Lipids in M_HDL','Phospholipids in M_HDL','Cholesterol in M_HDL','Ethnicity','BMI','Age','Sex'))
 setnames(data3,old=colnames(data3), new = c('X','Id',"Liver_fat"))
 
-## 1.4 Metabolites
+## 1.4 Metabolites 
 
 common4 <- intersect(df4$Eid, df22$Eid)
 df4_common = df4[common3, ]
@@ -30,11 +30,12 @@ df22_common = df22[common3, ]
 common4_comb = merge(df4, df22, by.x=c('Eid'), by.y=c('Eid'))
 df5 = common4_comb
 
+## 1.5 df6 consists with Patients columns (1-19), with basic diagnosis code   
+
 common5 <- intersect(df5$Eid, data3$Id)
 df5_common = df5[common4, ]
 data3_common = data3[common4, ]
 common5_comb = merge(df5, data3, by.x=c('Eid'), by.y=c('Id'))%>% 
   select('Eid','Patient_1', 'Patient_2','Patient_3','Patient_4','Patient_5','Patient_6','Patient_7','Patient_8','Patient_9','Patient_10','Patient_11','Patient_12','Patient_13','Patient_14','Patient_15','Patient_16','Patient_17','Patient_18','Diag-code','epistart','epiend', 'admidate', 'disdate','Gender','Birth_Year','Liver_fat','Total_Cholesterol','Total_Free_Cholesterol','Total_Triglycerides','LDL_Cholesterol','HDL_Cholesterol','Total_Cholesterol-HDL_C')
 df6 = common5_comb
-
 

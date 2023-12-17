@@ -1,3 +1,5 @@
+# Dataframe 
+
 df9 = df5%>%
   select('Eid_1','Medications_1','Medications_2','Medications_3','Medications_4','Medications_5','Medications_6','Medications_7','Medications_8','Medications_9','Medications_10','Medications_11','Medications_12','Medications_13','Medications_14','Medications_15','Medications_16','Medications_17','Medications_18','Medications_19')
 medication_group = df3%>%
@@ -26,7 +28,7 @@ df7[df7$Age > 65, "age_group"] <- "> 65"
 Hepa = df5%>%
   select('Eid_1','diag_icd10','Total_Free_C','Liver_fat','HDL_C','Total_Triglycerides','Clinical_LDL_C','icd_group')
 
-# 'ALAT','ASAT','GGT' enzymes for 
+# baseline metabolites enzymes parameters for new dataframe Healthy Patients. 
 
 max(Hepa$Concentration_of_HDL, na.rm = TRUE)
 Hepa1 = filter(Hepa, Total_Triglycerides < 1.5, )
@@ -41,11 +43,13 @@ Hepa_T = subset(Hepa,Liver_fat < 5 & HDL_C < 1.55 & Clinical_LDL_C < 2.6 & Total
 
 
 # Extracting Disease specific codes
+
 Hepa_T <- subset(Hepa, !(icd_group %in% c("K70.0", "K71.0", "K72.0", "K73.0", "K74.0", "K75.0", "K76.0", "K77.0","C22.0")))
 Hepa_T = Hepa_T[!duplicated(Hepa_T), ]
 
 
-# Mean values from Healthy Patients df 
+# Mean values from Healthy Patients df: 
+
 Hepa_T_mean <- colMeans(Hepa_T[, c(3, 4, 5, 6, 7, 8, 9)])
 
 # 1. Standard deviation Min and Max Values
@@ -66,7 +70,7 @@ metabolites2[metabolites2 == -999] <- NA
 HepaT = Hepa_T%>%
   select('Eid_1','diag_icd10','Total_Free_C','Liver_fat','HDL_C','Total_Triglycerides','Clinical_LDL_C')
 
-# 'ALAT','ASAT','GGT'
+# 'ALAT','ASAT','GGT' genes for observing summary.  
 
 summary_table <- data.frame(
   Variables = names(metabolites),
@@ -85,7 +89,7 @@ summary_table <- data.frame(
 Hepa_TT <- Hepa_TT[, -c(which(names(Hepa_TT) == "Eid_1"), which(names(Hepa_TT) == "diag_icd10"), which(names(Hepa_TT) == "icd_group"))]
 Hepa_TT <- as.data.frame(lapply(Hepa_T, as.numeric))
 
-# Healthy patient table 
+# Healthy patient table to analyze for mean, median, IQR dataframe. 
 
 Hepa_TT_summary <- data.frame(
   Variables = names(Hepa_TT),
@@ -98,12 +102,12 @@ Hepa_TT_summary <- data.frame(
   max = round(apply(Hepa_TT, 2, max, na.rm = TRUE), 2),
   mean = round(apply(Hepa_TT, 2, mean, na.rm = TRUE), 2))
 
-#Non Medications Group
+# Non Medications Group for healthy patients dataset. 
 
 No_Medication = filter(medication_group, rowSums(is.na(medication_group)) == ncol(medication_group)-1)
 Healthy_Patients <- No_Medication[!duplicated(No_Medication), ]
 
-# write created dataframes for saving generated content 
+# Write created dataframes for saving generated content 
 
 write.csv(No_medication_1, "C:/Users/User/Desktop/PhD Documentation/My drafts/No_Medication.csv", row.names=FALSE)
 write.csv(Hepa_T, "C:/Users/User/Desktop/PhD Documentation/My drafts/Healthy_Patients.csv", row.names=FALSE)
