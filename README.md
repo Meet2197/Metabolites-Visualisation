@@ -1,4 +1,4 @@
-#1.  About Project:
+#1.  About Project: ___
 
 Metabolic dysfunction-associated steatotic liver disease (MASLD) is the latest term for steatotic liver disease associated with metabolic syndrome. MASLD is the most common cause of chronic liver disease and is the leading cause of liver-related morbidity and mortality. 
 We provided here an analysis of Metabolites observation for MASLD Progression. 
