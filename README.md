@@ -1,9 +1,11 @@
-#1.  About Project: ___
+#1.  About Project: 
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 Metabolic dysfunction-associated steatotic liver disease (MASLD) is the latest term for steatotic liver disease associated with metabolic syndrome. MASLD is the most common cause of chronic liver disease and is the leading cause of liver-related morbidity and mortality. 
 We provided here an analysis of Metabolites observation for MASLD Progression. 
 
 #2. MASLD Development from normal liver : 
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 ![image](https://github.com/Meet2197/Metabolites-Visualisation/assets/125220294/de02ecc0-0049-435b-95c6-e35026025661)
 
@@ -13,11 +15,11 @@ We provided here an analysis of Metabolites observation for MASLD Progression.
 
 
 #3.  Developing mechanistic computational models to simulate and quantify MAFLD-specific and drug-induced alterations of VLDL production and secretion
-
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 Metabolites mechanic model is Part of the analysis of Lipidemia-associated disease MASLD. 
 
 #4 Data :
-
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 This Project is funded by DFZ and Uniklinik Aachen. Received database by UK Biobank,2023. 
 
 ![image](https://github.com/Meet2197/Metabolites-Visualisation/assets/125220294/4f34da6e-32ad-4356-8f3d-3016dc9fcdf5)  ![image](https://github.com/Meet2197/Metabolites-Visualisation/assets/125220294/50f14128-a55f-4e4a-83af-75b7ebe9a583) ![ukb logo](https://github.com/Meet2197/Metabolites-Visualisation/assets/125220294/fd6fb83d-0552-4ab1-8d1b-15ddd6b810f1)
