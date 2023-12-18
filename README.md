@@ -1,10 +1,10 @@
-#1.  About Project: 
+# 1.  About Project: 
 ___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 Metabolic dysfunction-associated steatotic liver disease (MASLD) is the latest term for steatotic liver disease associated with metabolic syndrome. MASLD is the most common cause of chronic liver disease and is the leading cause of liver-related morbidity and mortality. 
 We provided here an analysis of Metabolites observation for MASLD Progression. 
 
-#2. MASLD Development from normal liver : 
+# 2. MASLD Development from normal liver : 
 ___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 ![image](https://github.com/Meet2197/Metabolites-Visualisation/assets/125220294/de02ecc0-0049-435b-95c6-e35026025661)
@@ -14,11 +14,11 @@ ________________________________________________________________________________
 ![diagram Lipid Metabolism](https://github.com/Meet2197/Metabolites-Visualisation/assets/125220294/55a57765-c536-4852-96fb-a76e04d3d7ec)
 
 
-#3.  Developing mechanistic computational models to simulate and quantify MAFLD-specific and drug-induced alterations of VLDL production and secretion
+# 3.  Developing mechanistic computational models to simulate and quantify MAFLD-specific and drug-induced alterations of VLDL production and secretion
 ___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 Metabolites mechanic model is Part of the analysis of Lipidemia-associated disease MASLD. 
 
-#4 Data :
+# 4 Data :
 ___________________________________________________________________________________________________________________________________________________________________________________________________________________________
 This Project is funded by DFZ and Uniklinik Aachen. Received database by UK Biobank,2023. 
 
