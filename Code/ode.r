@@ -10,7 +10,7 @@ library(plotly)
 # this columns are selected sub-Metabolites from Metabolites dataframe from Metabolites.R file. This file have dataframe names metabolites and df3. We took merged data of df3. 
 # Mentioned Metabolites have association with exogenous lipo-protein pathway in liver. 
 
-selected_columns <- df6 %>%
+selected_columns <- metabolites %>%
   select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL')
 
 # Calculate the mean values for selected columns
@@ -45,7 +45,7 @@ P = round((ODE_stats$P_HDL) , 2)
  
 ode_system <- function(t, state, params) {
   with(as.list(c(state, params)), {
-    dVdt <- k1 * (C_V + T_V + E_V) * B - k2 * V
+    dVdt <- k1 * (C + T + E) * B - k2 * V
     dIdt <- k3 * 0.60 * V - k4 * I
     dLdt <- k5 * I * 0.5 - k6 * L
     dHdt <- k7 * 0.7 * A1 * (C_H + P) - k8 * 0.3 * A1 * H

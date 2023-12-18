@@ -56,11 +56,7 @@ Hepa_T_mean <- colMeans(Hepa_T[, c(3, 4, 5, 6, 7, 8, 9)])
 # calculate summary statistics for each column
 
 metabolites2 <- metabolites %>%
-  select('Total_C','Total_C-HDL_C','Remnant_C','VLDL_C','Clinical_LDL_C','LDL_C','HDL_C','Total_Triglycerides','Triglycerides_in_VLDL', 'Triglycerides_in_LDL','Triglycerides_in_HDL','Total_Phospholipids_in_Lipoprotein','Phospholipids_in_VLDL', 'Phospholipids_in_LDL','Phospholipids_in_HDL','Total_Esterified_C', 'Cholesteryl_Esters_in_VLDL','Cholesteryl_Esters_in_LDL','Cholesteryl_Esters_in_HDL','Total_Free_C','FC_in_VLDL','FC_in_LDL','FC_in HDL', 'Total Lipids in Lipoprotein ', 'Total Lipids in VLDL','Total Lipids in LDL','Total Lipids in HDL','Total  Lipoprotein ','VLDL','LDL','Concentration_of_HDL','Average Diameter for VLDL ','Average Diameter for LDL ,Average Diameter for HDL_','Phosphoglycerides','Triglycerides_to_Phosphoglycerides ratio','Total_Cholines','Phosphatidylcholines','Sphingomyelins','Apolipoprotein_B','Apolipoprotein_A1','Apolipo protein B-Apolipoprotein A1 ratio',
-         'Total_Fatty_Acids','Degree of Unsaturation','Omega-3 Fatty_Acids','Omega-6_Fatty_Acids','Polyunsaturated_Fatty_Acids','Monounsaturated_Fatty_Acids','Saturated_Fatty_Acids','Linoleic_Acid','DHA','Omega-3_Fatty_Acids_to_Total_Fatty_Acids_percentage','Omega-6 Fatty Acids to Total Fatty Acids percentage','Polyunsaturated Fatty Acids to Total Fatty Acids percentage','Monounsaturated Fatty Acids to Total Fatty Acids percentage','Saturated Fatty Acids to Total Fatty Acids percentage','Linoleic Acid to Total Fatty Acids percentage','Docosahexaenoic Acid to Total Fatty Acids percentage','Polyunsaturated Fatty Acids to Monounsaturated Fatty Acids ratio','Omega-6 Fatty Acids to Omega-3 Fatty Acids ratio','Alanine','Glutamine','Glycine','Histidine','Total  Branched-Chain Amino Acids (Leucine + Isoleucine + Valine)','Isoleucine','Leucine','Valine','Phenylalanine','Tyrosine','Glucose','Lactate','Pyruvate','Citrate','3-Hydroxybutyrate','Acetate','Acetoacetate','Acetone','Creatinine','Albumin','Glycoprotein Acetyls','	 Chylomicrons and EL_VLDL ','Total Lipids in Chylomicrons and EL_VLDL',
-         'Phospholipids in Chylomicrons and EL_VLDL','C in Chylomicrons and EL_VLDL','CE_ in Chylomicrons and EL_VLDL','FC_in Chylomicrons and EL_VLDL','Triglycerides in Chylomicrons and EL_VLDL',' VL_VLDL Particle','Total Lipids in VL_VLDL','Phospholipids in VL_VLD','C_ in VL_VLDL','CE_ in VL_VLDL','	FC_in VL_VLDL','Triglycerides in VL_VLDL',' L_VLDL ','Total Lipids in L_VLDL','Phospholipids in L_VLDL','C_ in L_VLDL','CE_ in L_VLDL','FC_in L_VLDL','Triglycerides in L_VLDL','M_VLDL','Total Lipids in M_VLDL','Phospholipids in M_VLDL','C_ in M_VLDL','CE_ in M_VLDL','FC_in M_VLDL','Triglycerides in M_VLDL','S_VLDL','Total Lipids in S_VLDL','Phospholipids in S_VLDL','C_ in S_VLDL','CE_ in S_VLDL','FC_in S_VLDL','Triglycerides in S_VLDL',
-         'VS_VLDL','Total Lipids in VS_VLDL','Phospholipids in_VS_VLDL','C_ in_VS_VLDL','CE_ in VS_VLDL','FC_in VS_VLDL','Triglycerides in VS_VLDL','IDL','Total Lipids in IDL','Phospholipids in IDL','C_ in IDL','	CE_ in IDL','FC_in_IDLs','Triglycerides in IDL','L_LDL','	Total Lipids in L_LDL','Phospholipids in L_LDL','C_ in L_LDL','CE_ in L_LDL','FC_in L_LDL','Triglycerides in L_LDL',' M_LDL ','Total Lipids in M_LDL','Phospholipids in M_LDL','C_ in M_LDL','CE_ in M_LDL','FC_in M_LDL','Triglycerides in M_LDL',' S_LDL ','Total Lipids in S_LDL','Phospholipids in S_LDL','C_ in S_LDL','CE_ in S_LDL','FC_in S_LDL','Triglycerides in S_LDL',' VL_HDL','Total Lipids in VL_HDL','Phospholipids in VL_HDL','C_ in VL_HDL',
-         'CE_ in VL_HDL','FC_in VL_HDL','Triglycerides in_VL_HDL',' L_HDL_','Total Lipids in L_HDL','Phospholipids in L_HDL','C_ in L_HDL','CE_ in L_HDL','FC_ in L_HDL','Triglycerides in L_HDL',' M_HDL','Total Lipids in M_HDL','Phospholipids in M_HDL','C_ in M_HDL')
+  select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL')
 metabolites2 <- data.frame(sapply(metabolites2, as.numeric))
 
 metabolites2[metabolites2 == -999] <- NA
@@ -73,15 +69,15 @@ HepaT = Hepa_T%>%
 # 'ALAT','ASAT','GGT' genes for observing summary.  
 
 summary_table <- data.frame(
-  Variables = names(metabolites),
-  Mean = round(colMeans(metabolites, na.rm = TRUE), 2),
-  SD = round(sapply(metabolites, sd, na.rm = TRUE), 2),
-  Median = round(sapply(metabolites, median, na.rm = TRUE), 2),
-  Q1 = round(sapply(metabolites, quantile, probs = 0.25, na.rm = TRUE), 2),
-  Q3 = round(sapply(metabolites, quantile, probs = 0.75, na.rm = TRUE), 2),
-  IQR = round(sapply(metabolites, IQR, na.rm = TRUE), 2),
-  Min = round(sapply(metabolites, min, na.rm = TRUE), 2),
-  Max = round(sapply(metabolites, max, na.rm = TRUE), 2),
+  Variables = names(metabolites2),
+  Mean = round(colMeans(metabolites2, na.rm = TRUE), 2),
+  SD = round(sapply(metabolites2, sd, na.rm = TRUE), 2),
+  Median = round(sapply(metabolites2, median, na.rm = TRUE), 2),
+  Q1 = round(sapply(metabolites2, quantile, probs = 0.25, na.rm = TRUE), 2),
+  Q3 = round(sapply(metabolites2, quantile, probs = 0.75, na.rm = TRUE), 2),
+  IQR = round(sapply(metabolites2, IQR, na.rm = TRUE), 2),
+  Min = round(sapply(metabolites2, min, na.rm = TRUE), 2),
+  Max = round(sapply(metabolites2, max, na.rm = TRUE), 2),
   stringsAsFactors = FALSE)
 
 # Create a function to calculate the summary statistics
