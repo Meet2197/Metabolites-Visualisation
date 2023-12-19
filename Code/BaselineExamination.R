@@ -2,7 +2,7 @@
 
 # Read the required data files :
 
-requirement <- read.csv(file = 'C:/Users/User/Desktop/Data/baselineRequire.csv') %>%
+requirement <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baselineRequire.csv') %>%
   select('eid', 'X6138.0.0', 'X2443.0.0')
 covariates2 <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates2.csv') %>%
   select('eid', 'X21003.0.0', 'X20116.0.0', 'X20117.0.0')
@@ -11,7 +11,10 @@ metabolites_baseline <- metabolites %>%
 
 # Read baseline data file :
 
-baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/baseline_data.csv')
+baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baseline_data.csv')
+
+# Rename column names :
+setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Qualifications', 'Diabetes', 'Age_AC', 'Smoking', 'Drinking', 'Diagnosis'))
 
 # Read another data file :
 
@@ -69,17 +72,14 @@ K760_common <- K760[bp1, ]
 bp1 <- merge(baseline, K760, by.x = 'EID', by.y = 'eid_1') %>%
   select("EID", "Qualifications", "Diabetes", "Age_AC", "Smoking", "Drinking", "BMI", "Sex", "Ethnicity", "Diagnosis") 
 
-# Rename column names :
-
-setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Qualifications', 'Diabetes', 'Age_AC', 'Smoking', 'Drinking', 'Diagnosis'))
-
 # Filter data based on specific values in a column:
 
 filtered_bp1 <- baseline_df[baseline_df$Diagnosis == "K760", ]
 filtered_bp2 <- baseline_df[baseline_df$Diagnosis != "K760", ]
 
-selected_values <- c("K70.0", "K71.0", "K72.0", "K73.0", "K74.0", "K75.0", "K76.0", "K77.0", "C22.0")
-filtered_bp2 <- baseline_df[baseline_df$Diagnosis_grp %in% selected_values, ]
+selected_values <- c("K70.0", "K71.0", "K72.0", "K73.0", "K74.0", "K75.0", "K76.0", "K77.0", "C22.0","K75.8")
+diagnosed_baseline <- baseline_df[baseline_df$Diagnosis_grp %in% selected_values, ]
+healthy_baseline <- baseline_df[!(baseline_df$Diagnosis_grp %in% selected_values), ]
 
 vtree(filtered_bp1, c("Diagnosis","Diabetes", "Drinking","Smoking"))
 vtree(filtered_bp2, c("Diagnosis", "Diabetes", "Drinking", "Smoking"), maxNodes = 503000)
