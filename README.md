@@ -14,8 +14,9 @@ ________________________________________________________________________________
 ![diagram Lipid Metabolism](https://github.com/Meet2197/Metabolites-Visualisation/assets/125220294/55a57765-c536-4852-96fb-a76e04d3d7ec)
 
 
-# 3.  Developing mechanistic computational models to simulate and quantify MAFLD-specific and drug-induced alterations of VLDL production and secretion
+# 3.  mechanistic computational models:
 ___________________________________________________________________________________________________________________________________________________________________________________________________________________________
+Developing model to simulate and quantify MAFLD-specific and drug-induced alterations of VLDL production and secretion
 Metabolites mechanic model is Part of the analysis of Lipidemia-associated disease MASLD. 
 
 # 4 Data :
