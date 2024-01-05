@@ -164,19 +164,31 @@ healthy_df = healthy_df[!duplicated(healthy_df), ]
 count(metformin_df)
 
 # Metformin :
+
 metformin_rows <- df3[rowSums(df3[, grepl("Medications_", names(df3))] == "metformin", na.rm = TRUE) > 0, ]
+
+# 
+
 metformin_df <- df3[, c('eid', 'icd_group', 'diag_icd10', names(df3)[metformin_columns])]
 metformin_df <- metformin_rows[, c('eid', 'diag_icd10', 'icd_group', grep("Medications_", names(df3), value = TRUE))]
 metformin_df = metformin_df[!duplicated(metformin_df), ]
 healthy_metformin_df <- metformin_df[!(metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0')), ]
 diagnosed_metformin_df <- metformin_df[metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0'), ]
+MAFLD_df <- diagnosed_metformin_df[diagnosed_metformin_df$icd_group == 'K76.0', ]
+#Frequency
+frequency_MAFLD_nonmetformin_df <- (nrow(MAFLD_df) / count) * 100
+NASH_df <- metformin_df[metformin_df$diag_icd10 == 'K758', ]
+frequency_NASH_df <- (nrow(MAFLD_df) / 91338) * 100 
 
-
-# non metformin
+# non metformin : 
 
 non_metformin_rows <- df3[rowSums(df3[, grepl("Medications_", names(df3))] == "metformin", na.rm = TRUE) == 0, ]
 non_metformin_df <- non_metformin_rows[, c('eid', 'icd_group', 'diag_icd10', grep("Medications_", names(df3), value = TRUE))]
 non_metformin_df = non_metformin_df[!duplicated(non_metformin_df), ]
+healthy_nonmetformin_df <- non_metformin_df[!(non_metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0')), ]
+diagnosed_nonmetformin_df  <- non_metformin_df[non_metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0'), ]
+MAFLD_nonmetformin_df <- diagnosed_nonmetformin_df[diagnosed_nonmetformin_df$icd_group == 'K76.0', ]
+frequency_MAFLD_nonmetformin_df <- (nrow(MAFLD_nonmetformin_df) / 91338) * 100
 
 
 ## 1.3 covariates file include baseline with itersect with df3. 
@@ -230,7 +242,7 @@ occurance2 = occurance[occurance$Freq > 1000,]
 
 # Use mutate_all and recode to transform all row values
 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140875408] <- "allopurinol" } 
+# for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140875408] <- "allopurinol" } 
 for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140883504] <- "cetirizine" }
 for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140916682] <- "evening primrose oil"} 
 for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140910814] <- "sodium thyroxine" } 
