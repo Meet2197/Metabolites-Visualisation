@@ -163,24 +163,40 @@ healthy_df = merge(df2, No_Medication, by.x=c('eid_1'), by.y=c('eid')) %>%
 healthy_df = healthy_df[!duplicated(healthy_df), ]
 count(metformin_df)
 
-# Metformin :
+# Metformin supplement from Medication dataframe:
+# medication file represents seperate file of Medications of Liver diseases used. 
 
-metformin_rows <- df3[rowSums(df3[, grepl("Medications_", names(df3))] == "metformin", na.rm = TRUE) > 0, ]
+# Separates rows with Metformin
+metformin_rows <- medication[rowSums(medication[, grepl("Medications_", names(medication))] == "metformin", na.rm = TRUE) > 0, ]
 
-# 
-
-metformin_df <- df3[, c('eid', 'icd_group', 'diag_icd10', names(df3)[metformin_columns])]
-metformin_df <- metformin_rows[, c('eid', 'diag_icd10', 'icd_group', grep("Medications_", names(df3), value = TRUE))]
+# metformin_df consists columns with Metfomin Eids 
+metformin_df <- medication[, c('eid', names(medication)[metformin_columns])]
+metformin_df <- metformin_rows[, c('eid', grep("Medications_", names(medication), value = TRUE))]
 metformin_df = metformin_df[!duplicated(metformin_df), ]
+# Create data table of metformin_df
+metformin_table <- data.table(metformin_df)
+
+# Identify rows that are not related to metformin and create negative control dataframe
+negative_control_df <- medication[!medication$eid %in% metformin_table$eid, ]
+
+# Create data table for negative control
+non_metformin_dt = negative_control_df[!duplicated(negative_control_df), ]
+negative_control_data_table <- data.table(negative_control_df)
+
+write.csv(metformin_table, "C:/Users/User/Desktop/Data/Results/metformin_table.csv", row.names=FALSE)
+write.csv(negative_control_data_table, "C:/Users/User/Desktop/Data/Results/non_metformin_dt.csv", row.names=FALSE)
+
+
 healthy_metformin_df <- metformin_df[!(metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0')), ]
 diagnosed_metformin_df <- metformin_df[metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0'), ]
 MAFLD_df <- diagnosed_metformin_df[diagnosed_metformin_df$icd_group == 'K76.0', ]
+
 #Frequency
 frequency_MAFLD_nonmetformin_df <- (nrow(MAFLD_df) / count) * 100
 NASH_df <- metformin_df[metformin_df$diag_icd10 == 'K758', ]
 frequency_NASH_df <- (nrow(MAFLD_df) / 91338) * 100 
 
-# non metformin : 
+# non-metformin : 
 
 non_metformin_rows <- df3[rowSums(df3[, grepl("Medications_", names(df3))] == "metformin", na.rm = TRUE) == 0, ]
 non_metformin_df <- non_metformin_rows[, c('eid', 'icd_group', 'diag_icd10', grep("Medications_", names(df3), value = TRUE))]
@@ -190,8 +206,7 @@ diagnosed_nonmetformin_df  <- non_metformin_df[non_metformin_df$icd_group %in% c
 MAFLD_nonmetformin_df <- diagnosed_nonmetformin_df[diagnosed_nonmetformin_df$icd_group == 'K76.0', ]
 frequency_MAFLD_nonmetformin_df <- (nrow(MAFLD_nonmetformin_df) / 91338) * 100
 
-
-## 1.3 covariates file include baseline with itersect with df3. 
+## 1.3 Covariates file include baseline with intersect with df3. 
 
 common4 <- intersect(df3$Eid, covariates$Eid_1)
 df3_common = df3[common4, ]

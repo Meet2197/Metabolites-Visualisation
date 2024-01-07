@@ -14,12 +14,24 @@ metabolites_baseline <- metabolites %>%
 baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baseline_data.csv')
 
 # Rename column names :
+
 setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Qualifications', 'Diabetes', 'Age_AC', 'Smoking', 'Drinking', 'Diagnosis'))
+baseline_df<- as.data.frame(baseline_df[!duplicated(baseline_df$eid),])
+
+mafld_baseline <- baseline_df[Diagnosis == 'K760', ]
+mafld_baseline <- baseline_df[baseline_df$Diagnosis == 'K760', ]
+nash_baseline <- baseline_df[baseline_df$Diagnosis == 'K758', ]
+non_mafld_baseline <- baseline_df[baseline_df$Diagnosis != 'K760', ]
+non_nash_baseline <- baseline_df[baseline_df$Diagnosis != 'K758', ]
 
 # Read another data file :
 
 baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv") %>%
   select("eid", "X21003.0.0", "X20116.0.0", "X20117.0.0", "X41270.0.0", "X6138.0.0", "X2443.0.0")
+
+hypertension_baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv") %>%
+  select("eid", "21003-0.0", "20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0", "4080-0.0","4079-0.0")
+Covariates2<- fread("ukb52200.csv", select=c("eid", "21000-0.0","21001-0.0"))
 
 # Rename column names :
 
