@@ -10,7 +10,7 @@ metabolites_baseline <- metabolites %>%
 
 # Read baseline data file :
 
-baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baseline_data.csv')
+baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baseline.csv')
 hypertension_baseline <- read.csv(file = 'C:/Users/User/Desktop/Data/hypertension_baseline.csv')
 
 # Rename column names :
@@ -25,12 +25,12 @@ non_nash_baseline <- baseline_df[baseline_df$Diagnosis != 'K758', ]
 
 # Read another data file :
 
-baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","21003-0.0","31-0.0", "20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0"))
-hypertension_baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv" ,select=c("eid", "21003-0.0", "31-0.0","20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0", "4080-0.0","4079-0.0"))
+#baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","21003-0.0","31-0.0","21001-0.0", "20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0"))
+#hypertension_baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv" ,select=c("eid", "21003-0.0", "31-0.0","20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0", "4080-0.0","4079-0.0"))
 
 # setnames for hypertension baseline_df:
 
-setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Age_AC', 'Gender','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes'))
+setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes'))
 setnames(hypertension_baseline, old = colnames(hypertension_baseline), new = c('eid','Age_AC', 'Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'Systolic_BP','Diastolic_BP'))
 
 Covariates2<- fread("ukb52200.csv", select=c("eid", "21000-0.0","21001-0.0"))

@@ -43,7 +43,7 @@ metabolite <- metabolites %>%
 # Mutation of data for Medication
  
 setnames(hesin_diag,"requires.eid",'eid_1')
-setnames(covariates, old=colnames(covariates), new = c('Eid_1','Birth_Year','Birth_Month','BMI','Age_at_Obs.','Gender'))
+setnames(covariates, old=colnames(covariates), new = c('eid','Birth_Year','Birth_Month','BMI','Age_at_Obs.','Gender'))
 setnames(medication, old=colnames(medication), new = c('eid','Medications_1','Medications_2','Medications_3','Medications_4','Medications_5','Medications_6','Medications_7','Medications_8','Medications_9','Medications_10','Medications_11','Medications_12','Medications_13','Medications_14','Medications_15','Medications_16','Medications_17','Medications_18','Medications_19'))
 setnames(metabolites, old=colnames(metabolites), new = c('No.','Eid','Tl_C','Tl_C-HDL_C','Re_C','VLDL_C','Cl_LDL_C','LDL_C','HDL_C','Tl_TG','TG_VLDL', 'TG_LDL','TG_HDL','Tl_P_Lipoprotein','P_VLDL', 'P_LDL','P_HDL','Tl_Esterified_C', 'CE_VLDL','CE_LDL','CE_HDL','Tl_Free_C','FC_VLDL','FC_LDL','FC_HDL', 'Tl_LP_Lipoprotein ', 'Tl_LP_VLDL','Tl_LP_LDL','Tl_LP_HDL','Tl  Lipoprotein ','VLDL','LDL','Concentration_of_HDL','Average Diameter for VLDL ','Average Diameter for LDL ,Average Diameter for HDL_','Pho','TG_to_Phosphoglycerides ratio','Tl_Cholines','Phosphatidylcholines','Sphingomyelins','Apo_B','Apo_A1','Apolipo protein B-Apo A1 ratio',
                                                          'Tl_FA_','Degree of Unsaturation','Omega-3_FA_','Omega-6_FA_','Polyunsaturated__FA_','Monounsaturated__FA_','Saturated__FA_','Linoleic_Acid','DHA','Omega-3_FA_to_Tl_FA_Per','Omega-6_FA_to Tl_FA_Per','Polyunsaturated_FA_to Tl_FA_Per','Monounsaturated_FA_to Tl_FA_Per','Saturated_FA_to Tl_FA_Per','LA_to Tl_FA_Per','Docosahexaenoic Acid to Tl_FA_Per','Polyunsaturated_FA_to Monounsaturated_FA_ratio','Omega-6_FA_to Omega-3_FA_ratio','Alanine','Glutamine','Glycine','Histidine','Tl  Branched-Chain Amino Acids (Leucine + Isoleucine + Valine)','Isoleucine','Leucine','Valine','Phenylalanine','Tyrosine','Glucose','Lactate','Pyruvate','Citrate','3-Hydroxybutyrate','Acetate','Acetoacetate','Acetone','Creatinine','Albumin','Glycoprotein Acetyls','	 CM and EL_VLDL ','Tl_LP_CM and EL_VLDL',
@@ -122,16 +122,6 @@ df6 = merge(medication, df2, by.x=c('eid'), by.y=c('eid_1')) %>%
 Nash = merge(NASH, metabolites, by.x=c('eid'), by.y=c('Eid')) %>%
   select('eid','icd_code','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL')
 
-K760 <- subset(hesin_diag, startsWith(as.character(diag_icd10), 'K760'))
-K760 <- as.data.frame(K760[!duplicated(K760$eid_1), ])
-K760$K760 <- 1
-K760 <- select(K760, c(eid_1, K760))
-
-K758 <- subset(hesin_diag, startsWith(as.character(diag_icd10), 'K758'))
-K758 <- as.data.frame(K758[!duplicated(K758$eid), ])
-K758$K758 <- 1
-K758 <- select(K758, c(eid_1, K758))
-
 common5 <- intersect(df2$eid_1, K758$eid_1)
 df5_common = df2[common5, ]
 K758_common = K758[common5, ]
@@ -162,26 +152,6 @@ healthy_df = merge(df2, No_Medication, by.x=c('eid_1'), by.y=c('eid')) %>%
 
 healthy_df = healthy_df[!duplicated(healthy_df), ]
 count(metformin_df)
-
-# Metformin supplement from Medication dataframe:
-# medication file represents seperate file of Medications of Liver diseases used. 
-
-# Separates rows with Metformin
-metformin_rows <- medication[rowSums(medication[, grepl("Medications_", names(medication))] == "metformin", na.rm = TRUE) > 0, ]
-
-# metformin_df consists columns with Metfomin Eids 
-metformin_df <- medication[, c('eid', names(medication)[metformin_columns])]
-metformin_df <- metformin_rows[, c('eid', grep("Medications_", names(medication), value = TRUE))]
-metformin_df = metformin_df[!duplicated(metformin_df), ]
-# Create data table of metformin_df
-metformin_table <- data.table(metformin_df)
-
-# Identify rows that are not related to metformin and create negative control dataframe
-negative_control_df <- medication[!medication$eid %in% metformin_table$eid, ]
-
-# Create data table for negative control
-non_metformin_dt = negative_control_df[!duplicated(negative_control_df), ]
-negative_control_data_table <- data.table(negative_control_df)
 
 write.csv(metformin_table, "C:/Users/User/Desktop/Data/Results/metformin_table.csv", row.names=FALSE)
 write.csv(negative_control_data_table, "C:/Users/User/Desktop/Data/Results/non_metformin_dt.csv", row.names=FALSE)
@@ -226,6 +196,8 @@ common6 <- intersect(death$eid_1 , death_cause$eid)
 death_common = death[common6, ]
 death_cause_common = death_cause[common6,]
 df6 = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
+NASH_death <- df6[df6$cause_icd10 == "K758", ]
+MASLD_death <- df6[df6$cause_icd10 == "K760", ]
 
 # Filter df6 based on icd_group
 
