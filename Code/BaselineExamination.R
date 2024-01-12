@@ -11,7 +11,7 @@ metabolites_baseline <- metabolites %>%
 # Read baseline data file :
 
 baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baseline.csv')
-hypertension_baseline <- read.csv(file = 'C:/Users/User/Desktop/Data/hypertension_baseline.csv')
+hypertension <- read.csv(file = 'C:/Users/User/Desktop/Data/hypertension_baseline.csv')
 
 # Rename column names :
 
@@ -31,29 +31,34 @@ non_nash_baseline <- baseline_df[baseline_df$Diagnosis != 'K758', ]
 # setnames for hypertension baseline_df:
 
 setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes'))
-setnames(hypertension_baseline, old = colnames(hypertension_baseline), new = c('eid','Age_AC', 'Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'Systolic_BP','Diastolic_BP'))
-
+setnames(hypertension, old = colnames(hypertension), new = c('eid','Age_AC', 'Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'Systolic_BP','Diastolic_BP'))
 Covariates2<- fread("ukb52200.csv", select=c("eid", "21000-0.0","21001-0.0"))
 
 # Create a new column for Systolic_BP categories
-hypertension_baseline$Systolic_Category <- cut(hypertension_baseline$Systolic_BP,
+
+hypertension$Systolic_Category <- cut(hypertension$Systolic_BP,
                                                breaks = c(-Inf, 120, 129, 139, 180, Inf),
                                                labels = c("Normal", "Elevated", "Stage 1", "Stage 2", "Stage 3"),
                                                include.lowest = TRUE)
 
 # Create a new column for Diastolic_BP categories
-hypertension_baseline$Diastolic_Category <- cut(hypertension_baseline$Diastolic_BP,
+
+hypertension$Diastolic_Category <- cut(hypertension$Diastolic_BP,
                                                 breaks = c(-Inf, 80, 89, 120, Inf),
                                                 labels = c("Normal", "Stage 1", "Stage 2", "Stage 3"),
                                                 include.lowest = TRUE)
 
 # Create the Hypertension column based on the conditions
-hypertension_baseline$Hypertension <- ifelse(hypertension_baseline$Systolic_BP >= 140 | hypertension_baseline$Diastolic_BP >= 90, 1, 0)
+
+hypertension$Hypertension <- ifelse(hypertension$Systolic_BP >= 140 | hypertension$Diastolic_BP >= 90, 1, 0)
 
 # Rename column names :
 
 setnames(covariates2, old = colnames(covariates2), new = c('eid', 'Age_AC', 'Smoking', 'Drinking'))
 setnames(requirement, old = colnames(requirement), new = c('EID', 'Qualifications', 'Diabetes'))
+
+# liver dysfunction = ALAT < 35 IU/l (male), < 25 IU/l (female)  | ASAT < 35 IU/l (male), < 25 IU/l (female)  |	GGT < 50 IU/l (male), < 35 IU/l (female)
+
 
 # Modify row values for specific columns :
 

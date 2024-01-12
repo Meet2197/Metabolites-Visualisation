@@ -48,8 +48,8 @@ ode_system <- function(t, state, params) {
     dVdt <- k1 * (C + T + E) * B - k2 * V
     dIdt <- k3 * 0.60 * V - k4 * I
     dLdt <- k5 * I * 0.5 - k6 * L
-    dHdt <- k7 * 0.7 * A1 * (C_H + P) - k8 * 0.3 * A1 * H
-    dAdt <- k9 - k7 * 0.7 * A1 * (C_H + P) + k8 (0.3)* H 
+    dHdt <- k7 * 0.7 * A1 * (C + P) - k8 * 0.3 * A1 * H
+    dAdt <- k9 - k7 * 0.7 * A1 * (C + P) + k8 (0.3)* H 
     dC_Vdt <- 0  # Add equations for the other variables
     dT_Vdt <- 0
     dE_Vdt <- 0
@@ -61,7 +61,7 @@ ode_system <- function(t, state, params) {
     return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dC_Vdt, dT_Vdt, dE_Vdt, dC_Hdt, dT_Hdt, dE_Hdt, dBdt, dPdt)))
   })
 }
-
+#(nls)
 # Set initial conditions(from metabolites dataframe) and parameters(constant values)
 
 initial_state <- c(H , V , I , L , A1, C_V , T_V , E_V , C_H , T_H , E_H , B , P)

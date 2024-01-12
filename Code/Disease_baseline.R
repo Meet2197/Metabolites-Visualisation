@@ -18,7 +18,7 @@ metformin_df = metformin_df[!duplicated(metformin_df), ]
 # data table of metformin_df :
 metformin <- data.table(metformin_df)
 
-# Identify rows that are not related to metformin and create negative control dataframe
+# Identify rows that are not related to metformin and create negative control dataframe 
 non_metformin <- medication[!medication$eid %in% metformin_table$eid, ]
 
 # Create data table for negative control
@@ -66,19 +66,22 @@ metformin_MASLD <- metformin_MASLD %>%
 
 MASLD_metformin_percent <- length(intersect(metformin_MASLD$eid, metformin_df$eid)) / length(metformin_df$eid) * 100
 
-
 # T test analysis with MASLD and Metformin 
+
 metformin_table$Metformin<-1
 MASLD$MASLD<-1
 
-Masld_t_test_metformin<-merge(covariates, metformin_table, by.x="eid", all.x=TRUE)
-Masld_t_test_metformin<-merge(Masld_t_test_metformin, MASLD, by.x="eid", by.y ="eid")
+Masld_t_test_metformin<-merge(baseline_df, metformin_table, by.x="eid", all.x=TRUE)
+Masld_t_test_metformin<-merge(Masld_t_test_metformin, MASLD, by.x="eid", by.y ="eid", all.x=TRUE)
+
 Masld_t_test_metformin$MASLD<-replace_na(Masld_t_test_metformin$MASLD, 0)
 Masld_t_test_metformin$Metformin<-replace_na(Masld_t_test_metformin$Metformin, 0)
+
 MASLD_t_test <- t.test(Masld_t_test_metformin$MASLD, Masld_t_test_metformin$Metformin)
 
-Masld_t_test_metformin$MASLD <- as.numeric(Masld_t_test_metformin$MASLD) - 1
-Masld_t_test_metformin$Metformin <- as.numeric(Masld_t_test_metformin$Metformin) - 1
+# Masld_t_test_metformin$MASLD <- as.numeric(Masld_t_test_metformin$MASLD) - 1 
+# Masld_t_test_metformin$Metformin <- as.numeric(Masld_t_test_metformin$Metformin) - 1
+
 MASLD$eid_1 <- as.numeric(MASLD$eid_1) - 1
 metformin_table$eid <- as.numeric(metformin_table$eid) - 1
 setnames(MASLD,"eid_1","eid")
@@ -110,12 +113,8 @@ non_metformin$nonmetformin<-1
 
 Masld_t_test_nonmetformin<-merge(covariates, non_metformin, by.x="eid", all.x=TRUE)
 Masld_t_test_nonmetformin<-merge(Masld_t_test_nonmetformin, MASLD, by.x="eid", all.x=TRUE)
-Masld_t_test_nonmetformin$MASLD<-replace_na(Masld_t_test_nonmetformin$MASLD, 0)
-Masld_t_test_nonmetformin$nonmetformin<-replace_na(Masld_t_test_nonmetformin$nonmetformin, 0)
-MASLD_t_test_nonmetformin <- t.test(Masld_t_test_nonmetformin$MASLD, Masld_t_test_nonmetformin$nonmetformin)
 
-Masld_t_test_nonmetformin$MASLD <- as.numeric(Masld_t_test_nonmetformin$MASLD) - 1
-Masld_t_test_nonmetformin$nonmetformin <- as.numeric(Masld_t_test_nonmetformin$nonmetformin) - 1
+MASLD_t_test <- t.test(Masld_t_test_metformin$MASLD, Masld_t_test_nonmetformin$nonmetformin)
 
 # Mean and standard deviation with/without metformin dataframes:
 
@@ -144,8 +143,6 @@ NASH_t_metformin<-merge(covariates, metformin, by.x="eid", all.x=TRUE)
 NASH_t_metformin<-merge(NASH_t_metformin, NASH, by.x="eid", all.x=TRUE)
 NASH_t_metformin$NASH<-replace_na(NASH_t_metformin$NASH, 0)
 NASH_t_metformin$metformin<-replace_na(NASH_t_metformin$metformin, 0)
-NASH_t_metformin$NASH <- as.numeric(NASH_t_metformin$NASH)
-NASH_t_metformin$metformin <- as.numeric(NASH_t_metformin$metformin)
 
 NASH_t_metformin <- t.test(NASH_t_metformin$NASH, NASH_t_metformin$metformin)
 
@@ -192,25 +189,12 @@ MASLD$MASLD<-1
 non_metformin$nonmetformin<-1
 metformin$metformin<-1
 
-merged_t_df<-merge(covariates, non_metformin, by.x="eid", all.x=TRUE)
-merged_t_df<-merge(merged_t_df, MASLD, by.x="eid", by.y = "eid") %>%
-  select('eid','BMI','Age_at_Obs.','Gender','nonmetformin','MASLD')
+NASH_t_metformin<-merge(covariates, metformin, by.x="eid", all.x=TRUE)
+NASH_t_metformin<-merge(NASH_t_metformin, NASH, by.x="eid", all.x=TRUE)
+NASH_t_metformin$NASH<-replace_na(NASH_t_metformin$NASH, 0)
+NASH_t_metformin$metformin<-replace_na(NASH_t_metformin$metformin, 0)
 
-merged_t_df<-merge(merged_t_df, NASH, by.x="eid", by.y="eid") %>%
-  select('eid','BMI','Age_at_Obs.','Gender','nonmetformin','MASLD','NASH')
-merged_t_df<-merge(merged_t_df, metformin, by.x="eid", by.y="eid") %>%
-  select('eid','BMI','Age_at_Obs.','Gender','nonmetformin','MASLD','NASH','metformin')
-
-merged_t_df$MASLD<-replace_na(merged_t_df$MASLD, 0)
-merged_t_df$metformin<-replace_na(merged_t_df$metformin, 0)
-merged_t_df$nonmetformin<-replace_na(merged_t_df$nonmetformin, 0)
-merged_t_df$NASH<-replace_na(merged_t_df$NASH, 0)
-
-Age_MASLD_t_metformin <- t.test(merged_t_df$MASLD, merged_t_df$metformin)
-
-merged_t_df$MASLD <- as.numeric(merged_t_df$MASLD)
-merged_t_df$nonmetformin <- as.numeric(merged_t_df$nonmetformin)
-
+NASH_t_metformin <- t.test(NASH_t_metformin$NASH, NASH_t_metformin$metformin)
 
 mean_NASH_metformin <- mean(NASH_metformin$eid, na.rm = TRUE)
 mean_NASH_non_metformin <- mean(NASH_non_metformin$eid, na.rm = TRUE)
@@ -542,3 +526,19 @@ sd_yes_non_metformin <- as.numeric(sd_yes_non_metformin)
 # standardized mean difference for yes of Diabetes at baseline with/without metformin: 
 
 smd_yes <- (mean_yes_metformin - mean_yes_nonmetformin) / sqrt((sd_yes_metformin^2 + sd_yes_non_metformin^2) / 2)
+
+# hypertension with metformin: 
+
+NASH$NASH<-1
+MASLD$MASLD<-1
+non_metformin$nonmetformin<-1
+metformin$metformin<-1
+
+Masld_t_test_hypertension<-merge(covariates, metformin_table, by.x="eid", all.x=TRUE)
+Masld_t_test_hypertension<-merge(Masld_t_test_hypertension, MASLD, by.x="eid", by.y ="eid")
+Masld_t_test_hypertension<-merge(Masld_t_test_metformin, hypertension_baseline, by.x="eid", by.y ="eid") %>%
+  select('eid','BMI','Age_at_Obs.','Gender','Smoking','Drinking','Diabetes','Hypertension','MASLD')
+
+Masld_t_test_metformin$MASLD<-replace_na(Masld_t_test_metformin$MASLD, 0)
+Masld_t_test_metformin$Metformin<-replace_na(Masld_t_test_metformin$Metformin, 0)
+

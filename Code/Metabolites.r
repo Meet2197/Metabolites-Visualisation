@@ -195,9 +195,9 @@ df5 = merge(df3, mri, by.x=c('Eid_1'), by.y=c('eid'))
 common6 <- intersect(death$eid_1 , death_cause$eid)
 death_common = death[common6, ]
 death_cause_common = death_cause[common6,]
-df6 = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
-NASH_death <- df6[df6$cause_icd10 == "K758", ]
-MASLD_death <- df6[df6$cause_icd10 == "K760", ]
+death_df = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
+NASH_death <- death_df[death_df$cause_icd10 == "K758", ]
+MASLD_death <- death_df[death_df$cause_icd10 == "K760", ]
 
 # Filter df6 based on icd_group
 
