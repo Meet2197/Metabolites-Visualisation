@@ -49,7 +49,7 @@ ode_system <- function(t, state, params) {
     dIdt <- k3 * 0.60 * V - k4 * I
     dLdt <- k5 * I * 0.5 - k6 * L
     dHdt <- k7 * 0.7 * A1 * (C_H + P) - k8 * 0.3 * A1 * H
-    dAdt <- k7 * 0.7 * A1 * (C_H + P) + k9 * H 
+    dAdt <- k9 - k7 * 0.7 * A1 * (C_H + P) + k8 (0.3)* H 
     dC_Vdt <- 0  # Add equations for the other variables
     dT_Vdt <- 0
     dE_Vdt <- 0
