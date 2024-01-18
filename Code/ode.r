@@ -2,6 +2,8 @@
 
 library(deSolve)
 library(plotly)
+library(minpack.lm)
+
 
 # the selected columns you want to work with in metabolites dataset. 
 
@@ -13,7 +15,7 @@ library(plotly)
 selected_columns <- metabolites %>%
   select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL')
 
-# Calculate the mean values for selected columns
+# the mean values for selected columns
 
 ODE_stats <- selected_columns %>%
   summarise(across(.fns = mean))
@@ -49,26 +51,23 @@ ode_system <- function(t, state, params) {
     dIdt <- k3 * 0.60 * V - k4 * I
     dLdt <- k5 * I * 0.5 - k6 * L
     dHdt <- k7 * 0.7 * A1 * (C + P) - k8 * 0.3 * A1 * H
-    dAdt <- k9 - k7 * 0.7 * A1 * (C + P) + k8 (0.3)* H 
+    dAdt <- k9 - k7 * 0.7 * A1 * (C + P) + k8 * (0.3) * H
     dC_Vdt <- 0  # Add equations for the other variables
     dT_Vdt <- 0
     dE_Vdt <- 0
     dC_Hdt <- 0
     dT_Hdt <- 0
-    dE_Hdt <- 0
-    dBdt <- 0
-    dPdt <- 0
-    return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dC_Vdt, dT_Vdt, dE_Vdt, dC_Hdt, dT_Hdt, dE_Hdt, dBdt, dPdt)))
+    
+    return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dC_Vdt, dT_Vdt, dE_Vdt, dC_Hdt, dT_Hdt)))
   })
 }
-#(nls)
-# Set initial conditions(from metabolites dataframe) and parameters(constant values)
 
-initial_state <- c(H , V , I , L , A1, C_V , T_V , E_V , C_H , T_H , E_H , B , P)
-parameters <- c(k1 = 1.0, k2 = 1.0, k3 = 1.0, k4 = 1.0, k5 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0 )
+# initial conditions(from metabolites dataframe) and parameters(constant values)
 
+initial_state <- c( C , T , E , V , I , L , B , A1 ,H, P)
+parameters <- c(k1 = 1.5, k2 = 2.0, k3 = 1.2, k4 = 1.8, k5 = 1.3, k6 = 1.7, k7 = 1.4, k8 = 1.9, k9 = 1.1, k10 = 0)
 
-# Define the time points for evaluation
+# time points for evaluation
 
 times <- c(0)
 
@@ -76,13 +75,11 @@ times <- c(0)
 
 hmax <- 0.1
 
-# Solve the ODE system
+#  ODE system
 
 solution <- ode(y = initial_state, times = times, func = ode_system, parms = parameters, hmax = hmax)
   
-print(solution)
-
-# Initialize a data frame to store derivatives
+# Initialize Metabolism_df to store derivatives
 
 Metabolism_df <- data.frame(Time = times, dVdt = numeric(length(times)),
                              dIdt = numeric(length(times)), 
@@ -90,7 +87,7 @@ Metabolism_df <- data.frame(Time = times, dVdt = numeric(length(times)),
                              dHdt = numeric(length(times)), 
                              dAdt = numeric(length(times)))
 
-# Calculate derivatives for each time point
+# derivatives for each time point
 
 for (i in 1:length(times)) {
   derivatives <- tryCatch(
@@ -110,7 +107,7 @@ for (i in 1:length(times)) {
 
 print(Metabolism_df)
 
-# Create a data frame for plotting
+# meatbolism_plot for plotting
 
 meatbolism_plot <- data.frame(Time = times,
                         dVdt = Metabolism_df$dVdt,
@@ -119,78 +116,111 @@ meatbolism_plot <- data.frame(Time = times,
                         dHdt = Metabolism_df$dHdt,
                         dAdt = Metabolism_df$dAdt)
 
-# Reshape the data frame into long format for ggplot
+# Reshape the meatbolism_plot into long format for ggplot
 
 meatbolism_plot1 <- tidyr::pivot_longer(meatbolism_plot, cols = -Time, names_to = "Variable", values_to = "Value")
 
-# Create a grouped bar plot for Metabolites secretion by using ggplot function. 
+# grouped bar plot for Metabolites secretion by using ggplot function. 
 
 ggplot(meatbolism_plot1, aes(x = Variable, y = Value, fill = Variable)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   geom_text(aes(label = round(Value, 2)), vjust = -0.5, position = position_dodge(width = 0.9)) +
-  labs(title = " ODE Metabolites Secretion", y = "Value(IQR)") +
+  labs(title = " ODE Metabolites Secretion", y = "Value(Mean)") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Particle size distribution
-
-particle_size_distribution <- function(t, state, parameters1) {
-  dVdt <- parameters1$k1 * (state$C_V + state$T_V + state$E_V) * state$B - parameters1$k2 * state$V
-  dIdt <- parameters1$k3 * 0.57 * dVdt - parameters1$k4 * state$I
-  dLdt <- parameters1$k5 * dIdt * 0.5 - parameters1$k6 * state$L * 0.5
-  dHdt <- parameters1$k7 * 0.7 * state$A1 * (state$C_H + state$P) - parameters1$k8 * 0.3 * state$A1 * state$H
-  dAdt <- parameters1$k7 * 0.7 * state$A1 * (state$C_H + state$P) + parameters1$k9 * dHdt
+#  NLS function with ODE system:
+nls_function <- function(C, T, E, V, I, L, B, A1, H, P, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10) {
+  ode_system <- function(t, state, params) {
+    with(as.list(c(state, params)), {
+      dVdt <- k1 * (C + T + E) * B - k2 * V
+      dIdt <- k3 * 0.60 * V - k4 * I
+      dLdt <- k5 * I * 0.5 - k6 * L
+      dHdt <- k7 * 0.7 * A1 * (C + P) - k8 * 0.3 * A1 * H
+      dAdt <- k9 - k7 * 0.7 * A1 * (C + P) + k8 * (0.3) * H
+      dC_Vdt <- 0  # Add equations for the other variables
+      dT_Vdt <- 0
+      dE_Vdt <- 0
+      dC_Hdt <- 0
+      dT_Hdt <- 0
+      
+      return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dC_Vdt, dT_Vdt, dE_Vdt, dC_Hdt, dT_Hdt)))
+    })
+   }
   
-# Coefficients for the particle size distribution
-
-  alpha1 <- parameters1$alpha1
-  alpha2 <- parameters1$alpha2
-  alpha3 <- parameters1$alpha3
-  alpha4 <- parameters1$alpha4
-  alpha5 <- parameters1$alpha5
-  alpha6 <- parameters1$alpha6
+  initial_state <- c( C , T , E , V , I , L , B , A1 ,H, P)
+  parameters <- c(k1 = 1.0, k2 = 1.0, k3 = 1.0, k4 = 1.0, k5 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0 , k10 = 0)
   
-  dPSDdt <- alpha1 * 0.57 * dVdt + alpha2 * dIdt * 0.5 + alpha3 * dLdt * 0.5 + alpha4 * 0.7 * state$A1 - alpha5 * 0.3 * state$A1 + alpha6 * 0.7 * state$A1
+  # time points for evaluation
   
-  return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dPSDdt)))
+  times <- c(0)
+  
+  # hmax to a non-negative value
+  
+  hmax <- 0.1
+  
+  # ODE system
+  
+  solution <- ode(y = initial_state, times = times, func = ode_system, parms = parameters, hmax = hmax)
 }
 
-# Example usage of ODE equation with metabolites. 
+# equilibrium states of the ODE
 
-initial_state <- list(
-  V = round((ODE_stats$L_VLDL + ODE_stats$VS_VLDL), 2),
-  I = round(ODE_stats$IDL, 2),
-  L = round(ODE_stats$S_LDL, 2),
-  C_V = round(ODE_stats$VLDL_C, 2),
-  T_V = round(ODE_stats$TG_VLDL, 2),
-  E_V = round(ODE_stats$CE_VLDL, 2),
-  T_H = round(ODE_stats$TG_HDL, 2),
-  E_H = round(ODE_stats$CE_HDL, 2),
-  C_H = round(ODE_stats$HDL_C, 2),
-  T_I = round(ODE_stats$TG_IDL, 2),
-  E_I = round(ODE_stats$CE_IDL, 2),
-  C_I = round(ODE_stats$C_IDL, 2),
-  C = round(ODE_stats$Total_C, 2),
-  T = round(ODE_stats$Total_TG, 2),
-  E = round(ODE_stats$Total_Esterified_C, 2),
-  B = round(ODE_stats$Apo_B, 2),
-  A1 = round(ODE_stats$Apo_A1, 2),
-  P = round(ODE_stats$Phospholipids_in_HDL, 2)
-)
+calculate_equilibrium <- function(k1, k2, k4, k6, k7, k8, k9, C, T, E, ApoB, P, HDL) {
+  V <- k1 * (C + T + E) * ApoB / k2
+  I <- k1 * (C + T + E) * ApoB * 0.60 / k4
+  L <- k4 * ApoB * I / (k6 * 0.5)
+  H <- k9 / (k8 * 0.7)
+  A <- k9 / (k7 * (C + P))
+  
+  equilibrium_state <- c(V, I, L, H, A)
+  # Filter out negative equilibrium states
+  positive_equilibrium <- equilibrium_state[equilibrium_state >= 0]
+  
+  return(positive_equilibrium)
+}
 
-parameters1 <- list(k1 = 1, k2 = 1, k3 = 1, k4 = 1, k5 = 1, k6 = 1, k7 = 1, k8 = 1, k9 = 1, alpha1 = 1, alpha2 = 1, alpha3 = 1, alpha4 = 1, alpha5 = 1, alpha6 = 1)
+# Example usage:
+parameters <- list(k1 = 1.0, k2 = 1.0, k4 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0,
+                   C, T , E , B, P , H)
 
-result <- particle_size_distribution(0, initial_state, parameters1)
+equilibrium <- calculate_equilibrium(parameters$k1, parameters$k2, parameters$k4, parameters$k6,
+                                     parameters$k7, parameters$k8, parameters$k9,
+                                     parameters$C, parameters$T, parameters$E, parameters$B,
+                                     parameters$P, parameters$L)
+print(equilibrium)
 
-dPSDdt_values <- result$dPSDdt
+# calculate the difference between measured metabolites and equilibrium state
+equilibrium_function <- function(k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, C, T, E, B, A1, P, H) {
+  V <- k1 * (C + T + E) * B / k2
+  I <- k1 * (C + T + E) * B * 0.60 / k4
+  L <- k4 * B * I / (k6 * 0.5)
+  H <- k7 * 0.7 * A1 * (C + P) / k8 * 0.3 * A1
+  A <- k9 / k8 * (0.7)
+  
+  return(c(V, I, L, H, A1, P))
+}
 
-# Dataframe generation for plotting particle_size_distribution
+# Define the objective function
+objective_function <- function(parameters, data) {
+  predicted_values <- equilibrium_function(parameters[1], parameters[2], parameters[3], parameters[4],
+                                           parameters[5], parameters[6], parameters[7], parameters[8],
+                                           parameters[9], parameters[10], data[1], data[2], data[3], 
+                                           data[4], data[5], data[6])
+  # Calculate sum of squared errors
+  error <- sum((predicted_values - data)^2)
+  
+  return(error)
+}
 
-plot_data <- data.frame(PSD = dPSDdt_values)
+# Initial parameter guesses
 
-# Create the time series plot without the time variable
+initial_guess <- c(k1 = 0.5, k2 = 0.5, k3 = 0.5, k4 = 0.5, k5 = 0.5, k6 = 0.5, k7 = 0.5, k8 = 0.5, k9 = 0.5)
 
-ggplot(data = data.frame(PSD = result$dPSDdt), aes(y = PSD)) +
-  geom_line() +
-  labs(y = "dPSD/dt") +
-  ggtitle("Particle Size Distribution Over Time")
+# Fit the model using nls
+fit <- nls(ODE_stats ~ equilibrium_function(k1, k2, k3, k4, k5, k6, k7, k8, k9, C, T, E, B, A1, P),
+           start = initial_guess, algorithm = "port", lower = rep(0, length(initial_guess)),
+           upper = rep(Inf, length(initial_guess)), control = list(maxiter = 1000))
+
+# Get the fitted parameters
+fitted_parameters <- coef(fit)
