@@ -18,7 +18,7 @@ metformin_df = metformin_df[!duplicated(metformin_df), ]
 metformin <- data.table(metformin_df)
 
 # Identify rows that are not related to metformin and create negative control dataframe 
-non_metformin <- medication[!medication$eid %in% metformin_table$eid, ]
+non_metformin <- medication[!medication$eid %in% metformin$eid, ]
 
 # Create data table for negative control
 non_metformin = non_metformin[!duplicated(non_metformin), ]
@@ -77,39 +77,46 @@ NASH$nash <-1
 # ALL file merge :
 
 MASLD_merge <-merge(baseline_df, MASLD, by.x="eid", all.x = TRUE, by.y="eid", all.y = TRUE )
-metformin_MASLD <-merge(MASLD_merge, metformin, by.x="eid", all.x = TRUE)
-ALL <-merge(metformin_MASLD, non_metformin, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE) %>%
-  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin','nonmetformin', 'MASLD')
+metformin_MASLD <-merge(MASLD_merge, metformin, by.x="eid", all.x = TRUE) %>%
+  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin', 'MASLD')
+ALL <-merge(metformin_MASLD, NASH, by.x="eid", by.y="eid", all.x = TRUE, all.y = TRUE )  %>%
+  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin', 'MASLD', 'nash')
+
+
 ALL <-merge(ALL, NON_MASLD, by.x="eid", all.x= TRUE )  %>%
-  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin','nonmetformin', 'MASLD', 'nonmasld')
-ALL <-merge(ALL, NASH, by.x="eid", by.y="eid", all.x = TRUE, all.y = TRUE )  %>%
-  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin','nonmetformin', 'MASLD', 'nash','nonmasld')
-ALL <-merge(ALL, death_df, by.x="eid", by.y="eid_1", all.x = TRUE, all.y = TRUE )  %>%
+  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin', 'MASLD', 'nonmasld')
+
+Death_all <-merge(ALL, death_df, by.x="eid", by.y="eid_1", all.x = TRUE, all.y = TRUE )  %>%
   select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin','cause_icd10', 'MASLD', 'nash','nonmasld')
 
-# Reshaping 
+# Reshaping :
+
 ALL$metformin_nonmetformin <- ifelse(!is.na(ALL$metformin) & ALL$metformin == 1, 1, 0)
 ALL$MASLD_nonmasld <- ifelse(!is.na(ALL$MASLD) & ALL$MASLD == 1, 1, 0)
-All_diabetets <- ALL[ALL$Diabetes == "1", ]
+ALL$Diabetes <- ifelse(ALL$Diabetes == 1, 1, 0)
 
 # Perform t-test
 
 MASLD_t_test_metformin <- t.test(ALL$metformin ~ ALL$MASLD)
-NASH_t_test_metformin <- t.test(ALL$metformin ~ ALL$nash)
+NASH_t_test_metformin <- t.test(ALL$metformin , ALL$nash)
 Gender_t_test_metformin <- t.test(ALL$metformin ~ ALL$Gender)
-MASLD_t_test_metformin_nonmetformin <- t.test(ALL$metformin_nonmetformin ~ ALL$MASLD)
-NASH_t_test_metformin_nonmetformin <- t.test(ALL$metformin_nonmetformin ~ ALL$nash)
-diabetes_t_test_metformin <- t.test(All_diabetets$metformin ~ All_diabetets$MASLD)
-diabetes_t_test_nonmetformin <- t.test(All_diabetets$nonmetformin ~ All_diabetets$MASLD)
-chisq_ALL <- chisq.test(ALL$nash , ALL$nonmetformin)
+diabetes_t_test_metformin <- t.test(ALL$metformin ~ ALL$Diabetes)
+BMI_t_test_metformin <- t.test(ALL$metformin , ALL$BMI)
+
+MASLD_t_test <- t.test(ALL$metformin, ALL$MASLD)
+NASH_t_test <- t.test(ALL$metformin, ALL$nash)
+
+# Performing t-test
+t_test_result <- t.test(group1, group2)
 
 # NAs to transform into 0 :
 
 ALL$MASLD<-replace_na(ALL$MASLD, 0)
 ALL$metformin<-replace_na(ALL$metformin, 0)
-ALL$nonmetformin<-replace_na(ALL$nonmetformin, 0)
 ALL$nonmasld<-replace_na(ALL$nonmasld, 0)
 ALL$nash<-replace_na(ALL$nash, 0)
+ALL$Diabetes <-replace_na(ALL$Diabetes, 0)
+ALL[is.na(ALL)] <- 0
 
 # Metformin group by 
 
@@ -138,7 +145,7 @@ mean_MASLD_non_metformin <- mean(MASLD_non_metformin$eid, na.rm = TRUE)
 sd_MASLD_metformin<- sd(metformin_MASLD$eid, na.rm = TRUE)
 sd_MASLD_non_metformin <- sd(MASLD_non_metformin$eid, na.rm = TRUE)
 
-# chanigng data with numeric format:  
+# adding dataframe numeric fomrmat:  
 
 mean_MASLD_metformin <- as.numeric(mean_MASLD_metformin)
 mean_MASLD_non_metformin <- as.numeric(mean_MASLD_non_metformin)
@@ -296,8 +303,8 @@ BMI_t_test <- t.test(BMI_metformin$eid, BMI_nonmetformin$eid)
 
 # Gender based Calculation of Metformin(Female)
 
-baseline_df$Gender <- str_replace_all(baseline_df$Gender, c("0" = "Female", "1" = "Male"))
-baseline_female <- baseline_df[baseline_df$Gender == "Female", ]
+ALL$Gender <- str_replace_all(ALL$Gender, c("0" = "Female", "1" = "Male"))
+ALL_female <- baseline_df[baseline_df$Gender == "Female", ]
 common15 <- intersect(metformin_df$eid, baseline_female$eid)
 metformin_df_common <- metformin_df[metformin_df$eid %in% common15, ]
 baseline_female_common  <- baseline_female[baseline_female$eid %in% common15, ]
@@ -456,20 +463,21 @@ smd_no <- (mean_no_metformin - mean_no_nonmetformin) / sqrt((sd_no_metformin^2 +
 
 
 # Diabetes based Calculation of Metformin
+# Calculate number of diabetic patients
+num_diabetic <- sum(ALL$Diabetes == 1, na.rm = TRUE)
+num_non_diabetic <- sum(ALL$Diabetes == 0, na.rm = TRUE)
 
-baseline_yes <- baseline_df[baseline_df$Diabetes == "Yes", ]
-common21 <- intersect(metformin_df$eid, baseline_yes$eid)
-metformin_df_common <- metformin_df[metformin_df$eid %in% common21, ]
-baseline_yes_common  <- baseline_yes[baseline_yes$eid %in% common21, ]
-yes_metformin <- merge(metformin_df_common, baseline_yes_common, 
-                        by.x = "eid", by.y = "eid", suffixes = c('_metformin', '_Yes'))
-yes_metformin <- yes_metformin %>% 
-  select(eid, Diabetes)
+# Calculate percentage of diabetic patients
+percent_diabetic <- num_diabetic / nrow(ALL) * 100
+percent_non_diabetic <- num_non_diabetic / nrow(ALL) * 100
 
-# Diabetes Yes at Baseline with metformin percentage calculation:
+# Calculate number of diabetic patients who have consumed metformin
+num_diabetic_metformin <- sum(ALL$Diabetes == 1 & ALL$metformin == 1, na.rm = TRUE)
+num_diabetic_non_metformin <- sum(ALL$Diabetes == 1 & ALL$metformin == 0, na.rm = TRUE)
 
-yes_metformin_diabetes <- length(intersect(yes_metformin$eid, metformin_df$eid)) / length(metformin_df$eid) * 100
-
+# Calculate percentage of diabetic patients who have consumed metformin
+percent_diabetic_metformin <- num_diabetic_metformin / num_diabetic * 100
+percent_diabetic_non_metformin <- num_diabetic_non_metformin / num_diabetic * 100
 
 # Diabetes based Calculation of NonMetformin
 baseline_yes <- baseline_df[baseline_df$Diabetes == "Yes", ]

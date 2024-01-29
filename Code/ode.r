@@ -44,7 +44,8 @@ P = round((ODE_stats$P_HDL) , 2)
 
 # ODE system df Extracts initial state values from ODE_table. This ODE system dataframe calculates ODE equation written. 
 # This equation provides calculations of VLDL, IDL, LDL, HDL, Apo A1, Apo B metabolits for VLDL synthesis.   
- 
+# calculate_equilibrium as base value should return derivative value as zero.
+
 ode_system <- function(t, state, params) {
   with(as.list(c(state, params)), {
     dVdt <- k1 * (C + T + E) * B - k2 * V
@@ -57,7 +58,6 @@ ode_system <- function(t, state, params) {
     dE_Vdt <- 0
     dC_Hdt <- 0
     dT_Hdt <- 0
-    
     return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dC_Vdt, dT_Vdt, dE_Vdt, dC_Hdt, dT_Hdt)))
   })
 }
@@ -65,7 +65,7 @@ ode_system <- function(t, state, params) {
 # initial conditions(from metabolites dataframe) and parameters(constant values)
 
 initial_state <- c( C , T , E , V , I , L , B , A1 ,H, P)
-parameters <- c(k1 = 1.5, k2 = 2.0, k3 = 1.2, k4 = 1.8, k5 = 1.3, k6 = 1.7, k7 = 1.4, k8 = 1.9, k9 = 1.1, k10 = 0)
+parameters <- c(k1 = 1.5, k2 = 2.0, k3 = 1.2, k4 = 1.8, k5 = 1.3, k6 = 1.7, k7 = 1.4, k8 = 1.9, k9 = 1.1)
 
 # time points for evaluation
 
@@ -78,7 +78,11 @@ hmax <- 0.1
 #  ODE system
 
 solution <- ode(y = initial_state, times = times, func = ode_system, parms = parameters, hmax = hmax)
-  
+
+# Check if all quantities are constant in time
+quantities_constant <- apply(solution, 2, function(x) all.equal(x, x[1]))
+print(quantities_constant)
+
 # Initialize Metabolism_df to store derivatives
 
 Metabolism_df <- data.frame(Time = times, dVdt = numeric(length(times)),
@@ -129,47 +133,12 @@ ggplot(meatbolism_plot1, aes(x = Variable, y = Value, fill = Variable)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-#  NLS function with ODE system:
-nls_function <- function(C, T, E, V, I, L, B, A1, H, P, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10) {
-  ode_system <- function(t, state, params) {
-    with(as.list(c(state, params)), {
-      dVdt <- k1 * (C + T + E) * B - k2 * V
-      dIdt <- k3 * 0.60 * V - k4 * I
-      dLdt <- k5 * I * 0.5 - k6 * L
-      dHdt <- k7 * 0.7 * A1 * (C + P) - k8 * 0.3 * A1 * H
-      dAdt <- k9 - k7 * 0.7 * A1 * (C + P) + k8 * (0.3) * H
-      dC_Vdt <- 0  # Add equations for the other variables
-      dT_Vdt <- 0
-      dE_Vdt <- 0
-      dC_Hdt <- 0
-      dT_Hdt <- 0
-      
-      return(list(c(dVdt, dIdt, dLdt, dHdt, dAdt, dC_Vdt, dT_Vdt, dE_Vdt, dC_Hdt, dT_Hdt)))
-    })
-   }
-  
-  initial_state <- c( C , T , E , V , I , L , B , A1 ,H, P)
-  parameters <- c(k1 = 1.0, k2 = 1.0, k3 = 1.0, k4 = 1.0, k5 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0 , k10 = 0)
-  
-  # time points for evaluation
-  
-  times <- c(0)
-  
-  # hmax to a non-negative value
-  
-  hmax <- 0.1
-  
-  # ODE system
-  
-  solution <- ode(y = initial_state, times = times, func = ode_system, parms = parameters, hmax = hmax)
-}
+# equilibrium states of the ODE. 
 
-# equilibrium states of the ODE
-
-calculate_equilibrium <- function(k1, k2, k4, k6, k7, k8, k9, C, T, E, ApoB, P, HDL) {
-  V <- k1 * (C + T + E) * ApoB / k2
-  I <- k1 * (C + T + E) * ApoB * 0.60 / k4
-  L <- k4 * ApoB * I / (k6 * 0.5)
+calculate_equilibrium <- function(k1, k2, k4, k6, k7, k8, k9, C, T, E, B, P, I) { # function used for calculate equilibrium.
+  V <- k1 * (C + T + E) * B / k2
+  I <- k1 * (C + T + E) * B * 0.60 / k4
+  L <- k4 * B * I / (k6 * 0.5)
   H <- k9 / (k8 * 0.7)
   A <- k9 / (k7 * (C + P))
   
@@ -181,46 +150,70 @@ calculate_equilibrium <- function(k1, k2, k4, k6, k7, k8, k9, C, T, E, ApoB, P, 
 }
 
 # Example usage:
-parameters <- list(k1 = 1.0, k2 = 1.0, k4 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0,
-                   C, T , E , B, P , H)
+parameter <- list(k1 = 1.0, k2 = 1.0, k4 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0,
+                   C, T , E , B, P , I)
 
-equilibrium <- calculate_equilibrium(parameters$k1, parameters$k2, parameters$k4, parameters$k6,
-                                     parameters$k7, parameters$k8, parameters$k9,
-                                     parameters$C, parameters$T, parameters$E, parameters$B,
-                                     parameters$P, parameters$L)
-print(equilibrium)
+# Calculate equilibrium values independently
+equilibrium_values <- calculate_equilibrium(k1 = parameter$k1, k2 = parameter$k2, k4 = parameter$k4,
+                                            k6 = parameter$k6, k7 = parameter$k7, k8 = parameter$k8,
+                                            k9 = parameter$k9, C = parameter$C, T = parameter$T,
+                                            E = parameter$E, B = parameter$B, P = parameter$P, I = parameter$I)
 
-# calculate the difference between measured metabolites and equilibrium state
-equilibrium_function <- function(k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, C, T, E, B, A1, P, H) {
-  V <- k1 * (C + T + E) * B / k2
-  I <- k1 * (C + T + E) * B * 0.60 / k4
-  L <- k4 * B * I / (k6 * 0.5)
-  H <- k7 * 0.7 * A1 * (C + P) / k8 * 0.3 * A1
-  A <- k9 / k8 * (0.7)
+# Create an empty dataframe to store the results
+results_df <- data.frame()
+
+# Iterate over different parameter settings
+for (param_setting in names(parameter)) {
+  # Create a temporary parameter list
+  temp_param <- parameter
+  # Assign the current parameter setting to the corresponding parameter
+  temp_param[[param_setting]] <- parameter[[param_setting]]
   
-  return(c(V, I, L, H, A1, P))
+  # Calculate equilibrium values
+  equilibrium_values <- calculate_equilibrium(
+    k1 = temp_param$k1, k2 = temp_param$k2, k4 = temp_param$k4,
+    k6 = temp_param$k6, k7 = temp_param$k7, k8 = temp_param$k8,
+    k9 = temp_param$k9, C = temp_param$C, T = temp_param$T,
+    E = temp_param$E, B = temp_param$B, P = temp_param$P,
+    I = temp_param$I
+  )
+  
+  # Create a dataframe for the current parameter setting
+  temp_df <- data.frame(
+    k1 = temp_param$k1, k2 = temp_param$k2, k4 = temp_param$k4,
+    k6 = temp_param$k6, k7 = temp_param$k7, k8 = temp_param$k8,
+    k9 = temp_param$k9, C = temp_param$C, T = temp_param$T,
+    E = temp_param$E, B = temp_param$B, P = temp_param$P,
+    I = temp_param$I, V = equilibrium_values[1],
+    I_equilibrium = equilibrium_values[2],
+    L = equilibrium_values[3], H = equilibrium_values[4],
+    A = equilibrium_values[5]
+  )
+  
+  # Append the dataframe to the results dataframe
+  results_df <- rbind(results_df, temp_df)
 }
 
-# Define the objective function
-objective_function <- function(parameters, data) {
-  predicted_values <- equilibrium_function(parameters[1], parameters[2], parameters[3], parameters[4],
-                                           parameters[5], parameters[6], parameters[7], parameters[8],
-                                           parameters[9], parameters[10], data[1], data[2], data[3], 
-                                           data[4], data[5], data[6])
-  # Calculate sum of squared errors
-  error <- sum((predicted_values - data)^2)
-  
-  return(error)
+
+# Define the function to calculate the difference between the measured metabolites and the equilibrium state
+
+objective_function <- function(params, measured_metabolites) {
+  predicted_metabolites <- calculate_equilibrium(params$k1, params$k2, params$k4, params$k6,
+                                                 params$k7, params$k8, params$k9,
+                                                 measured_metabolites$C, measured_metabolites$T, measured_metabolites$E, measured_metabolites$B,
+                                                 measured_metabolites$P, measured_metabolites$I)
+  sum((predicted_metabolites - unlist(measured_metabolites))^2)
 }
 
-# Initial parameter guesses
+# Example data (replace with your actual measured metabolites)
+measured_metabolites <- list(H, V, I, L, C_V, T_V, E_V, T_H, E_H, C_H, T_I, E_I, C_I, C, T, E, B, A1, P)
+params <- list(k1 = 1.0, k2 = 1.0, k4 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0)
 
-initial_guess <- c(k1 = 0.5, k2 = 0.5, k3 = 0.5, k4 = 0.5, k5 = 0.5, k6 = 0.5, k7 = 0.5, k8 = 0.5, k9 = 0.5)
+# Initial guess for parameters
 
-# Fit the model using nls
-fit <- nls(ODE_stats ~ equilibrium_function(k1, k2, k3, k4, k5, k6, k7, k8, k9, C, T, E, B, A1, P),
-           start = initial_guess, algorithm = "port", lower = rep(0, length(initial_guess)),
-           upper = rep(Inf, length(initial_guess)), control = list(maxiter = 1000))
+initial_guess <- c(k1 = 1.0, k2 = 1.0, k3 = 1.0, k4 = 1.0, k5 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0)
 
-# Get the fitted parameters
-fitted_parameters <- coef(fit)
+formula <- as.formula("y ~ 0")
+
+# Fit the model using NLS :
+fit <- nls(formula, start = initial_guess, data = list(y = objective_function(params, measured_metabolites)))
