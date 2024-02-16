@@ -17,6 +17,17 @@ metformin_df = metformin_df[!duplicated(metformin_df), ]
 # data table of metformin_df :
 metformin <- data.table(metformin_df)
 
+# Separates rows with pioglitazone supplements : 
+pioglitazone_rows <- medication[rowSums(medication[, grepl("Medications_", names(medication))] == "pioglitazone", na.rm = TRUE) > 0, ]
+
+# metformin_df consists columns with pioglitazone Eids 
+
+pioglitazone_df <- pioglitazone_rows[, c('eid', grep("Medications_", names(medication), value = TRUE))]
+pioglitazone_df = pioglitazone_df[!duplicated(pioglitazone_df), ]
+
+# data table of pioglitazone_df :
+pioglitazone <- data.table(pioglitazone_df)
+
 # Identify rows that are not related to metformin and create negative control dataframe 
 non_metformin <- medication[!medication$eid %in% metformin$eid, ]
 
@@ -73,6 +84,7 @@ MASLD$MASLD <-1
 non_metformin$nonmetformin <-1
 NON_MASLD$nonmasld <-1
 NASH$nash <-1
+pioglitazone$pioglitazone <-1
 
 # ALL file merge :
 
@@ -82,6 +94,11 @@ metformin_MASLD <-merge(MASLD_merge, metformin, by.x="eid", all.x = TRUE) %>%
 ALL <-merge(metformin_MASLD, NASH, by.x="eid", by.y="eid", all.x = TRUE, all.y = TRUE )  %>%
   select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin', 'MASLD', 'nash')
 
+# pioglitazone MERGE WITH masld  :
+pioglitazone_MASLD <-merge(MASLD_merge, pioglitazone, by.x="eid", all.x = TRUE) %>%
+  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','pioglitazone', 'MASLD')
+ALL_pioglitazone <-merge(pioglitazone_MASLD, NASH, by.x="eid", by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
+  select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','pioglitazone', 'MASLD', 'nash')
 
 ALL <-merge(ALL, NON_MASLD, by.x="eid", all.x= TRUE )  %>%
   select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','metformin', 'MASLD', 'nonmasld')
@@ -110,6 +127,9 @@ NASH_t_test <- t.test(ALL$metformin, ALL$nash)
 t_test_result <- t.test(group1, group2)
 
 # NAs to transform into 0 :
+pioglitazone_MASLD$MASLD<-replace_na(pioglitazone_MASLD$MASLD, 0)
+pioglitazone_MASLD$pioglitazone<-replace_na(pioglitazone_MASLD$pioglitazone, 0)
+ALL_pioglitazone$nash<-replace_na(ALL_pioglitazone$nash, 0)
 
 ALL$MASLD<-replace_na(ALL$MASLD, 0)
 ALL$metformin<-replace_na(ALL$metformin, 0)

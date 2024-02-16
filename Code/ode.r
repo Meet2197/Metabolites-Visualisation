@@ -3,6 +3,7 @@
 library(deSolve)
 library(plotly)
 library(minpack.lm)
+library(rootSolve)
 
 
 # the selected columns you want to work with in metabolites dataset. 
@@ -43,11 +44,9 @@ A1 = round((ODE_stats$Apo_A1) , 2)
 P = round((ODE_stats$P_HDL) , 2)
 
 # ODE system df Extracts initial state values from ODE_table. This ODE system dataframe calculates ODE equation written. 
-# This equation provides calculations of VLDL, IDL, LDL, HDL, Apo A1, Apo B metabolits for VLDL synthesis.   
-# calculate_equilibrium as base value should return derivative value as zero.
 
-ode_system <- function(t, state, params) {
-  with(as.list(c(state, params)), {
+ode_system <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
     dVdt <- k1 * (C + T + E) * B - k2 * V
     dIdt <- k3 * 0.60 * V - k4 * I
     dLdt <- k5 * I * 0.5 - k6 * L
@@ -63,28 +62,60 @@ ode_system <- function(t, state, params) {
 }
 
 # initial conditions(from metabolites dataframe) and parameters(constant values)
-
-initial_state <- c( C , T , E , V , I , L , B , A1 ,H, P)
-parameters <- c(k1 = 1.5, k2 = 2.0, k3 = 1.2, k4 = 1.8, k5 = 1.3, k6 = 1.7, k7 = 1.4, k8 = 1.9, k9 = 1.1)
+initial_state <- c(C, T, E, V, I, L, B, A1, H, P)
+parameters <- c(k1 = 0.161458496, k2 = 2.422826931, k3 = 1.405571595, k4 = 3.291376316, k5 = 0.451208455, k6 = -0.170891244, k7 = 0.001364831, k8 = 2.032226068, k9 = -0.008550932)
 
 # time points for evaluation
-
-times <- c(0)
+times <- c(0) # arbitary positive values
 
 # Set hmax to a non-negative value (e.g., 0.1)
-
 hmax <- 0.1
 
-#  ODE system
+# ODE system
+solution <- ode(y = initial_state, 
+                times = times, 
+                func = ode_system, 
+                parms = parameters, 
+                hmax = hmax)
 
-solution <- ode(y = initial_state, times = times, func = ode_system, parms = parameters, hmax = hmax)
+# Print the solution
+print(solution)
 
-# Check if all quantities are constant in time
-quantities_constant <- apply(solution, 2, function(x) all.equal(x, x[1]))
-print(quantities_constant)
+
+# Parameter guess by using new formula based on params
+
+objective <- function(params) { # objective(params) is vector & params as input
+  k1 <- params[1]
+  k2 <- params[2]
+  k3 <- params[3]
+  k4 <- params[4]
+  k5 <- params[5]
+  k6 <- params[6]
+  k7 <- params[7]
+  k8 <- params[8]
+  k9 <- params[9]
+  
+  dVdt <- k1 * (C + T + E) * B - k2 * V
+  dIdt <- k3 * 0.60 * V - k4 * I
+  dLdt <- k5 * I * 0.5 - k6 * L
+  dHdt <- k7 * 0.7 * A1 * (C + P) - k8 * 0.3 * A1 * H
+  dAdt <- k9 - k7 * 0.7 * A1 * (C + P) + k8 * 0.3 * H # variables V, C, T, E, B, I, L, A1, H, P
+  
+  sum(dVdt^2, dIdt^2, dLdt^2, dHdt^2, dAdt^2)  # Minimize sum of squares
+}
+
+# Initial guess for parameters
+parameters_guess <- c(1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+# Minimize objective function
+params_zero <- optim(parameters_guess, objective)$par
+df_params_zero <- data.frame(parameters = paste0("k", 1:length(params_zero)), value = params_zero)
+
+
+#Print rough guess of K values. 
+print(params_zero)
 
 # Initialize Metabolism_df to store derivatives
-
 Metabolism_df <- data.frame(Time = times, dVdt = numeric(length(times)),
                              dIdt = numeric(length(times)), 
                              dLdt = numeric(length(times)), 
@@ -133,9 +164,8 @@ ggplot(meatbolism_plot1, aes(x = Variable, y = Value, fill = Variable)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# equilibrium states of the ODE. 
-
-calculate_equilibrium <- function(k1, k2, k4, k6, k7, k8, k9, C, T, E, B, P, I) { # function used for calculate equilibrium.
+# calculate equilibrium states of the ODE. 
+calculate_equilibrium <- function(k1, k2, k4, k6, k7, k8, k9, C, T, E, B, P, I) {
   V <- k1 * (C + T + E) * B / k2
   I <- k1 * (C + T + E) * B * 0.60 / k4
   L <- k4 * B * I / (k6 * 0.5)
@@ -143,77 +173,73 @@ calculate_equilibrium <- function(k1, k2, k4, k6, k7, k8, k9, C, T, E, B, P, I) 
   A <- k9 / (k7 * (C + P))
   
   equilibrium_state <- c(V, I, L, H, A)
-  # Filter out negative equilibrium states
   positive_equilibrium <- equilibrium_state[equilibrium_state >= 0]
   
   return(positive_equilibrium)
 }
 
-# Example usage:
-parameter <- list(k1 = 1.0, k2 = 1.0, k4 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0,
-                   C, T , E , B, P , I)
+# Example values for the parameters
+k1 <- 1
+k2 <- 1
+k3 <- 1
+k4 <- 1
+k5 <- 1
+k6 <- 1
+k7 <- 1
+k8 <- 1
+k9 <- 1
 
-# Calculate equilibrium values independently
-equilibrium_values <- calculate_equilibrium(k1 = parameter$k1, k2 = parameter$k2, k4 = parameter$k4,
-                                            k6 = parameter$k6, k7 = parameter$k7, k8 = parameter$k8,
-                                            k9 = parameter$k9, C = parameter$C, T = parameter$T,
-                                            E = parameter$E, B = parameter$B, P = parameter$P, I = parameter$I)
+# Calculate equilibrium values
+equilibrium_values <- calculate_equilibrium(k1, k2, k4, k6, k7, k8, k9, C, T, E, B, P, I)
 
-# Create an empty dataframe to store the results
-results_df <- data.frame()
+# Create a data frame with the equilibrium values
+equilibrium_df <- data.frame(V = equilibrium_values[1],
+                 I = equilibrium_values[2],
+                 L = equilibrium_values[3],
+                 H = equilibrium_values[4],
+                 A = equilibrium_values[5])
 
-# Iterate over different parameter settings
-for (param_setting in names(parameter)) {
-  # Create a temporary parameter list
-  temp_param <- parameter
-  # Assign the current parameter setting to the corresponding parameter
-  temp_param[[param_setting]] <- parameter[[param_setting]]
+print(equilibrium_df)
+
+
+# NLS function usage for assuming konstant values:
+
+objective <- function(params) {
+  k1 <- params[1]
+  k2 <- params[2]
+  k3 <- params[3]
+  k4 <- params[4]
+  k5 <- params[5]
+  k6 <- params[6]
+  k7 <- params[7]
+  k8 <- params[8]
+  k9 <- params[9]
   
-  # Calculate equilibrium values
-  equilibrium_values <- calculate_equilibrium(
-    k1 = temp_param$k1, k2 = temp_param$k2, k4 = temp_param$k4,
-    k6 = temp_param$k6, k7 = temp_param$k7, k8 = temp_param$k8,
-    k9 = temp_param$k9, C = temp_param$C, T = temp_param$T,
-    E = temp_param$E, B = temp_param$B, P = temp_param$P,
-    I = temp_param$I
-  )
+  # Calculate derivatives using the ode_system function
+  derivs <- ode_system(0, initial_state, c(k1, k2, k3, k4, k5, k6, k7, k8, k9))
   
-  # Create a dataframe for the current parameter setting
-  temp_df <- data.frame(
-    k1 = temp_param$k1, k2 = temp_param$k2, k4 = temp_param$k4,
-    k6 = temp_param$k6, k7 = temp_param$k7, k8 = temp_param$k8,
-    k9 = temp_param$k9, C = temp_param$C, T = temp_param$T,
-    E = temp_param$E, B = temp_param$B, P = temp_param$P,
-    I = temp_param$I, V = equilibrium_values[1],
-    I_equilibrium = equilibrium_values[2],
-    L = equilibrium_values[3], H = equilibrium_values[4],
-    A = equilibrium_values[5]
-  )
+  # Extract derivatives
+  dVdt <- derivs$dVdt
+  dIdt <- derivs$dIdt
+  dLdt <- derivs$dLdt
+  dHdt <- derivs$dHdt
+  dAdt <- derivs$dAdt
   
-  # Append the dataframe to the results dataframe
-  results_df <- rbind(results_df, temp_df)
+  # Calculate the sum of squares of derivatives
+  sum_squares <- sum(dVdt^2, dIdt^2, dLdt^2, dHdt^2, dAdt^2)
+  
+  return(sum_squares)  # Minimize sum of squares
 }
-
-
-# Define the function to calculate the difference between the measured metabolites and the equilibrium state
-
-objective_function <- function(params, measured_metabolites) {
-  predicted_metabolites <- calculate_equilibrium(params$k1, params$k2, params$k4, params$k6,
-                                                 params$k7, params$k8, params$k9,
-                                                 measured_metabolites$C, measured_metabolites$T, measured_metabolites$E, measured_metabolites$B,
-                                                 measured_metabolites$P, measured_metabolites$I)
-  sum((predicted_metabolites - unlist(measured_metabolites))^2)
-}
-
-# Example data (replace with your actual measured metabolites)
-measured_metabolites <- list(H, V, I, L, C_V, T_V, E_V, T_H, E_H, C_H, T_I, E_I, C_I, C, T, E, B, A1, P)
-params <- list(k1 = 1.0, k2 = 1.0, k4 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0)
 
 # Initial guess for parameters
+parameters_guess <- c(1, 1, 1, 1, 1, 1, 1, 1, 1)
 
-initial_guess <- c(k1 = 1.0, k2 = 1.0, k3 = 1.0, k4 = 1.0, k5 = 1.0, k6 = 1.0, k7 = 1.0, k8 = 1.0, k9 = 1.0)
+# Minimize objective function using nls
+fit <- optim(parameters_guess, objective)
 
-formula <- as.formula("y ~ 0")
+# Estimated parameters
+params_zero <- coef(fit)
 
-# Fit the model using NLS :
-fit <- nls(formula, start = initial_guess, data = list(y = objective_function(params, measured_metabolites)))
+# Print estimated parameters
+print(params_zero)
+
