@@ -45,11 +45,11 @@ metabolite <- metabolites %>%
 setnames(hesin_diag,"requires.eid",'eid_1')
 setnames(covariates, old=colnames(covariates), new = c('eid','Birth_Year','Birth_Month','BMI','Age_at_Obs.','Gender'))
 setnames(medication, old=colnames(medication), new = c('eid','Medications_1','Medications_2','Medications_3','Medications_4','Medications_5','Medications_6','Medications_7','Medications_8','Medications_9','Medications_10','Medications_11','Medications_12','Medications_13','Medications_14','Medications_15','Medications_16','Medications_17','Medications_18','Medications_19'))
-setnames(metabolites, old=colnames(metabolites), new = c('No.','eid','Tl_C','Tl_C-HDL_C','Re_C','VLDL_C','Cl_LDL_C','LDL_C','HDL_C','Tl_TG','TG_VLDL', 'TG_LDL','TG_HDL','Tl_P_Lipoprotein','P_VLDL', 'P_LDL','P_HDL','Tl_Esterified_C', 'CE_VLDL','CE_LDL','CE_HDL','Tl_Free_C','FC_VLDL','FC_LDL','FC_HDL', 'Tl_LP_Lipoprotein ', 'Tl_LP_VLDL','Tl_LP_LDL','Tl_LP_HDL','Tl  Lipoprotein ','VLDL','LDL','Concentration_of_HDL','Average Diameter for VLDL ','Average Diameter for LDL ,Average Diameter for HDL_','Pho','TG_to_Phosphoglycerides ratio','Tl_Cholines','Phosphatidylcholines','Sphingomyelins','Apo_B','Apo_A1','Apolipo protein B-Apo A1 ratio',
-                                                         'Tl_FA_','Degree of Unsaturation','Omega-3_FA_','Omega-6_FA_','Polyunsaturated__FA_','Monounsaturated__FA_','Saturated__FA_','Linoleic_Acid','DHA','Omega-3_FA_to_Tl_FA_Per','Omega-6_FA_to Tl_FA_Per','Polyunsaturated_FA_to Tl_FA_Per','Monounsaturated_FA_to Tl_FA_Per','Saturated_FA_to Tl_FA_Per','LA_to Tl_FA_Per','Docosahexaenoic Acid to Tl_FA_Per','Polyunsaturated_FA_to Monounsaturated_FA_ratio','Omega-6_FA_to Omega-3_FA_ratio','Alanine','Glutamine','Glycine','Histidine','Tl  Branched-Chain Amino Acids (Leucine + Isoleucine + Valine)','Isoleucine','Leucine','Valine','Phenylalanine','Tyrosine','Glucose','Lactate','Pyruvate','Citrate','3-Hydroxybutyrate','Acetate','Acetoacetate','Acetone','Creatinine','Albumin','Glycoprotein Acetyls','	 CM and EL_VLDL ','Tl_LP_CM and EL_VLDL',
-                                                         'P_CM and EL_VLDL','C_CM and EL_VLDL','CE_CM and EL_VLDL','FC_CM and EL_VLDL','TG_CM and EL_VLDL',' VL_VLDL Particle','Tl_LP_VL_VLDL','P_VL_VLD','C_VL_VLDL','CE_VL_VLDL','FC_VL_VLDL','TG_VL_VLDL','L_VLDL','Tl_LP_L_VLDL','P_L_VLDL','C_L_VLDL','CE_L_VLDL','FC_L_VLDL','TG_L_VLDL','M_VLDL','Tl_LP_M_VLDL','P_M_VLDL','C_M_VLDL','CE_M_VLDL','FC_M_VLDL','TG_M_VLDL','S_VLDL','Tl_LP_S_VLDL','P_S_VLDL','C_S_VLDL','CE_S_VLDL','FC_S_VLDL','TG_S_VLDL',
-                                                         'VS_VLDL','Tl_LP_VS_VLDL','Ph__VS_VLDL','C_VS_VLDL','CE_VS_VLDL','FC_VS_VLDL','TG_VS_VLDL','IDL','Tl_LP_IDL','P_IDL','C_IDL','CE_IDL','FC_IDLs','TG_IDL','L_LDL','Tl_LP_L_LDL','P_L_LDL','C_L_LDL','CE_L_LDL','FC_L_LDL','TG_L_LDL','M_LDL','Tl_LP_M_LDL','P_M_LDL','C_M_LDL','CE_M_LDL','FC_M_LDL','TG_M_LDL','S_LDL','Tl_LP_S_LDL','P_S_LDL','C_S_LDL','CE_S_LDL','FC_S_LDL','TG_S_LDL',' VL_HDL','Tl_LP_VL_HDL','P_VL_HDL','C_VL_HDL',
-                                                         'CE_VL_HDL','FC_VL_HDL','TG_VL_HDL','L_HDL','Tl_LP_L_HDL','P_L_HDL','C_L_HDL','CE_L_HDL','FC_L_HDL','TG_L_HDL','M_HDL','Tl_LP_M_HDL','P_M_HDL','C_M_HDL','Ethnicity','BMI','Age','Sex'))
+setnames(metabolites, old=colnames(metabolites), new = c('No.','eid','TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLCL',
+                                                         'PC','S','AB','A1','ABA1','TLFA','DU','O3FA','O6FA','PUFA','MUFA','SFA','LA','DHA','O3Tl','O6TL','PUTL','MUTL','STL','LATL','DCATL','PUMU','O63R','ALA','GLT','GLY','HIS','TLAA','ISO','LEU','VAL','PHA','TYR','GLS','LAC','PYR','CIT',
+                                                         'H3','ACT','ACTA','ATN','CTN','ALB','GPA','CMEL','LPEL','PCMEL','CCMEL','CECEL','FCMEL','TGEL',' VLV','TLVLV','PVLV','CVLV','CEVLV','FCVLV','TVLV','LV','TLPLV','PLV','CLV','CELV','FCLV','TGLV','MV','TLPMV','PMV','CMV','CEMV','FCMV',
+                                                         'TMV','SV','TLPSV','PSV','CSV','CESV','FCSV','TGSV','VSV','TLPVSV','PVSV','CVSV','CEVSV','FCVSV','TGVSV','I','TLPI','PI','CI','CEI','FCI','TGI','LL','TLPLL','PLL','CLL','CELL','FCLL','TGLL','ML','TLPML','PML','CML','CEML','FCML',
+                                                         'TGML','SL','TLPSL','PSL','CSL','CESL','FCSL','TGSL','VLH','TLPVLH','PVLH','CVLH','CEVLH','FCVLH','TGVLH','LH','TLPLH','PLH','CLH','CELH','FCLH','TGLH','MH','TLPMH','PMH','CMHD','Ethnicity','BMI','Age','Sex'))
 setnames(mri,old=colnames(mri), new = c('eid',"Liver_fat"))
 setnames(covariates2,old=colnames(covariates2),new = c('eid','ALAT','ASAT','GGT'))
 setnames(death,"eid","eid_1")
@@ -230,89 +230,14 @@ occurance2 = occurance[occurance$Freq > 1000,]
 # Use mutate_all and recode to transform all row values
 
 # for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140875408] <- "allopurinol" } 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140883504] <- "cetirizine"}
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140916682] <- "evening primrose oil"} 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140910814] <- "sodium thyroxine" } 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140863152] <- "diazepam" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140865580] <- "asacol-400mg-e/c-tablet" } 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140871310] <- "ibuprofen" } 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140868226] <- "Aspirin" } 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140879616] <- "amitriptyline" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140922174] <- "alendronate_sodium"} 
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140870390] <- "ferrous sulphate" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140871310] <- "ibuprofen" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140888366] <- "thiamine_preparation" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140860696] <- "lisinopril" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140864752] <- "lansoprazole" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140871024] <- "vitamin_b_compound_tablet" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140879760] <- "bisoprolol" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140879802] <- "amlodipine" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140923346] <- "co-codamol" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1141182628] <- "tiotropium" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1141176832] <- "seretide_50_evohaler" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1141145660] <- "valsartan" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140863144] <- "zopiclone" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140926606] <- "salbutamol_100micrograms_spacehaler" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140888510] <- "verapamil" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140883066] <- "insulin product" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140860806] <- "ramipril" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140909708] <- "furosemide" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 99999] <- "uncoded" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140864992] <- "tramadol" }
-for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140884600] <- "metformin" }
+for (i in seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140860806] <- "ramipril" }
 
-for (i in seq_along(medication)) {
-  medication[[i]][medication[[i]] == 1140884600] <- "metformin"
-}
+for (i in seq_along(medication)) {  medication[[i]][medication[[i]] == 1140884600] <- "metformin" }
+for (i in seq_along(medication)) {  medication[[i]][medication[[i]] == 1141171646] <- "pioglitazone"}
 
-
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140865716] <- "senna" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 2038460150] <- "paracetamol" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140874930] <- "prednisolone" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140888266] <- "warfarin" } 
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140910766] <- "nicorandil" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140874420] <- "quinine" } 
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140879406] <- "ranitidine" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140881856] <- "salbutamol" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1141191044] <- "levothyroxine sodium" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 6] <- "Non-cancer Illness"}
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 3004] <- "Mobility problem severity" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140851028] <- "chalk" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140884412] <- "sumatriptan" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140865634] <- "omeprazole" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 2038460150] <- "paracetamol" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140866738] <- "atenolol" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1141146234] <- "NA" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140861958] <- "NA" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1141194794] <- "bendroflumethiazide" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1141188442] <- "glucosamine product" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140909674] <- "cod_liver_oil_capsule" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140868226] <- "Aspirin" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140852976] <- "multivitamins" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140861998] <- "ventolin 100micrograms inhaler" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1193] <- "omega-3/fish oil supplement" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140909726] <- "vitamin c product" }
-for (i_seq_along(medication))  { medication[[i]][medication[[i]] %in% 1140888538] <- "zinc product" }
-
-# Ethnicity values change 
-
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 1001] <- "British" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 6] <- "Other ethnic group" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 3] <- "Asian" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 1002] <- "Irish" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 3001] <- "Indian" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% -3] <- "Prefer not to answer" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 4001] <- "Caribbean" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 1003] <- "Any other white background" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 1002] <- "Irish" }
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 2001] <- "White and Black Caribbean" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 3002] <- "Pakistani" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 4002] <- "African" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% 3004] <- "Any other Asian background" } 
-for (i_seq_along(metabolites)) { metabolites[[i]][metabolites[[i]] %in% -1] <- "Do not know" }
 
 # Genes changes
-for (i_seq_along(genes)) { genes[[i]][genes[[i]] %in% 0] <- "Physical activity" } %>% { genes[[i]][genes[[i]] %in% 1] <- "heterozygous" } %>% { genes[[i]][genes[[i]] %in% 2] <- "homozygous" }
+for (i in seq_along(genes)) { genes[[i]][genes[[i]] %in% 0] <- "Physical activity" } %>% { genes[[i]][genes[[i]] %in% 1] <- "heterozygous" } %>% { genes[[i]][genes[[i]] %in% 2] <- "homozygous" }
 
 #Hesin diagnosis coding
 
