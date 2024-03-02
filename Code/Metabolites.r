@@ -11,7 +11,7 @@ library(DT)
 library(naniar)
 library(ggplot2)
 
-# Read Text and CSV Files_the R Script 
+Read Text and CSV Files_the R Script
 
 medication <- read.csv(file = 'C:/Users/User/Desktop/Data/medication.csv')[ ,2:21]
 covariates <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates_Markus.csv')[ ,2:7]
@@ -33,7 +33,7 @@ genes <- read.csv(file = 'C:/Users/User/Desktop/Data/genes.csv') %>%
          "rs2856718_T","rs7453920_A","rs3077_G","rs9277535_G","rs58542926_T","rs455804_A","rs738409_G")   
 NASH <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/Nash.csv')
 
-# After setnames of metabolites,
+# After setnames of metabolites:
 
 metabolite <- metabolites %>%
   select('Eid','Ethnicity','BMI','Age','Sex')
@@ -56,6 +56,7 @@ setnames(death,"eid","eid_1")
 setnames(NASH,"X41202.0.0","icd_code")
 setnames(K760,"K760","Diagnosis")
 
+#'TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLC','PC','S','AB','A1','ABA1','TLFA','DU','O3FA'
 
 # sapply(data2$epistart, typeof), class(data2$epistart)
 
@@ -230,11 +231,11 @@ occurance2 = occurance[occurance$Freq > 1000,]
 # Use mutate_all and recode to transform all row values
 
 # for (i_seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140875408] <- "allopurinol" } 
-for (i in seq_along(medication)) { medication[[i]][medication[[i]] %in% 1140860806] <- "ramipril" }
+for (i in seq_along(medication)) { medication[[i]][medication[[i]] ==1140860806] <- "ramipril" }
+for (i in seq_along(medication)) { medication[[i]][medication[[i]] == 1140884600] <- "metformin"}
+for (i in seq_along(medication)) { medication[[i]][medication[[i]] == 1141171646] <- "pioglitazone"}
 
-for (i in seq_along(medication)) {  medication[[i]][medication[[i]] == 1140884600] <- "metformin" }
-for (i in seq_along(medication)) {  medication[[i]][medication[[i]] == 1141171646] <- "pioglitazone"}
-
+# Ethnicity values change 
 
 # Genes changes
 for (i in seq_along(genes)) { genes[[i]][genes[[i]] %in% 0] <- "Physical activity" } %>% { genes[[i]][genes[[i]] %in% 1] <- "heterozygous" } %>% { genes[[i]][genes[[i]] %in% 2] <- "homozygous" }
