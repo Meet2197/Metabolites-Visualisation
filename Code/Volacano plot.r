@@ -5,9 +5,11 @@ library(ggplot2)
 library(ggrepel)
 library(effectsize)
 library(plotly)
+library(EnhancedVolcano)
+library(DESeq2)
 
 # File upload : 
-# 
+
 metabolite_metformin <-merge(ALL, metabolites, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
   select('eid','TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLCL',
          'PC','S','AB','A1','ABA1','TLFA','DU','O3FA','O6FA','PUFA','MUFA','SFA','LA','DHA','O3Tl','O6TL','PUTL','MUTL','STL','LATL','DCATL','PUMU','O63R','ALA','GLT','GLY','HIS','TLAA','ISO','LEU','VAL','PHA','TYR','GLS','LAC','PYR','CIT',
@@ -93,18 +95,6 @@ table_smd<-table_smd[-c(1,2,3)]
 # merging generated  smd and metformin tables of above code:
 all_Metformin<-cbind(table_smd, final_table_Metformin)
 
-smd_values[3,]=c(3,smd_values[2,-1]/smd_values[1,-1])
-
-# Add another new row at index 4
-smd_df[4,] <- c(4, log2(smd_df[3,]))
-
-# Remove the first three rows
-table_smd<-as.data.frame(t(as.data.frame(smd_df)))
-table_smd<-table_smd[-c(1,2,3)]
-
-# merging generated  smd and metformin tables of above code:
-all_Metformin<-cbind(table_smd, final_table_Metformin)
-
 # name change for smd 
 colnames(all_Metformin)[colnames(all_Metformin) == "4"] <- "smd"
 
@@ -115,14 +105,13 @@ threshold <- 1
 all_Metformin <- subset(all_Metformin, logp >= 0 & logp <= 125, smd >= -4 & smd <= 4)
 ggplot(all_Metformin, aes(x = smd, y = logp)) +
   geom_point(aes(color = logp > threshold)) +
-  geom_text_repel(aes(label = rownames(all_Metformin)),size = 2, box.padding = unit(0.25, "lines"), max.overlaps = 75) +
+  geom_text_repel(aes(label = rownames(all_Metformin)),size = 3, box.padding = unit(0.25, "lines"), max.overlaps = 75) +
   scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black")) +
   labs(title = "Volcano Plot of Metformin Data",x = "Standard Mean Difference (SMD)",y = "-log10(p-value)") +
   coord_cartesian(ylim = c(0, 125),xlim = c(-4 ,4)) +
   theme_minimal()
 
-library(EnhancedVolcano)
-library(DESeq2)
+# fold change for enhanced volcano plot
 
 all_Metformin$log2FoldChange <- log2(all_Metformin$smd)
 
