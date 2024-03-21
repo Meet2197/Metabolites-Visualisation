@@ -10,8 +10,16 @@ library(janitor)
 library(DT)
 library(naniar)
 library(ggplot2)
+library(plotly)
+library(readr)
+library(ggrepel)
+library(EnhancedVolcano)
+library(effectsize)
+library(broom)
+library(MatchIt)
+library(cobalt)
 
-Read Text and CSV Files_the R Script
+# Read Text and CSV Files_the R Script
 
 medication <- read.csv(file = 'C:/Users/User/Desktop/Data/medication.csv')[ ,2:21]
 covariates <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates_Markus.csv')[ ,2:7]
@@ -120,15 +128,6 @@ df6 = merge(medication, df2, by.x=c('eid'), by.y=c('eid_1')) %>%
          
 # NASH icd code comaprison with Sub metabolites. 
 
-Nash = merge(NASH, metabolites, by.x=c('eid'), by.y=c('Eid')) %>%
-  select('eid','icd_code','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL')
-
-common5 <- intersect(df2$eid_1, K758$eid_1)
-df5_common = df2[common5, ]
-K758_common = K758[common5, ]
-df5 = merge(df2, K758, by.x=c('eid_1'), by.y=c('eid_1')) %>%
-  select('eid_1','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL','diag_icd10') 
-
 MAFLD_df <- subset(df2, startsWith(as.character(diag_icd10), 'K760'))
 Fibrosis_cirrhosis <- df2[df2$icd_group == 'K74.0' & !is.na(df2$icd_group), ]
 neoplasm <- df2[df2$icd_group == 'C22.0' & !is.na(df2$icd_group), ]
@@ -197,6 +196,7 @@ common6 <- intersect(death$eid_1 , death_cause$eid)
 death_common = death[common6, ]
 death_cause_common = death_cause[common6,]
 death_df = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
+death_df = death_df[!duplicated(death_df$eid_1), ]
 NASH_death <- death_df[death_df$cause_icd10 == "K758", ]
 MASLD_death <- death_df[death_df$cause_icd10 == "K760", ]
 
@@ -240,19 +240,18 @@ for (i in seq_along(medication)) { medication[[i]][medication[[i]] == 1141171646
 # Genes changes
 for (i in seq_along(genes)) { genes[[i]][genes[[i]] %in% 0] <- "Physical activity" } %>% { genes[[i]][genes[[i]] %in% 1] <- "heterozygous" } %>% { genes[[i]][genes[[i]] %in% 2] <- "homozygous" }
 
-#Hesin diagnosis coding
+# Hesin diagnosis coding :
 
 hesin_diag[hesin_diag$diag_icd10 %in% c("K700", "K701", "K702", "K703", "K704", "K705", "K706", "K707", "K708", "K709"), "icd_group"] <- "K70.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K710", "K711", "K712", "K713", "K714", "K715", "K716", "K717", "K718", "K719"), "icd_group"] <- "K71.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K720", "K721", "K722", "K723", "K724", "K725", "K726", "K727", "K728", "K729"), "icd_group"] <- "K72.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K730", "K731", "K732", "K733", "K734", "K735", "K736", "K737", "K738", "K739"), "icd_group"] <- "K73.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K740", "K741", "K742", "K743", "K744", "K745", "K746", "K747", "K748", "K749"), "icd_group"] <- "K74.0"
-hesin_diag[hesin_diag$diag_icd10 %in% c("K750", "K751", "K752", "K753", "K754", "K755", "K756", "K757", "K759"), "icd_group"] <- "K75.0"
+hesin_diag[hesin_diag$diag_icd10 %in% c("K750", "K751", "K752", "K753", "K754", "K755", "K756", "K757", "K758", "K759"), "icd_group"] <- "K75.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K760", "K761", "K762", "K763", "K764", "K765", "K766", "K767", "K768", "K769"), "icd_group"] <- "K76.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K770", "K771", "K772", "K773", "K774", "K705", "K776", "K777", "K778", "K779"), "icd_group"] <- "K77.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K220", "K221", "K222", "K223", "K224", "K705", "K226", "K227", "K228", "K229"), "icd_group"] <- "C22.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K75.8"), "icd_group"] <- "K75.8"
-
 # ICD CODE grouping
 
 death_cause[death_cause$cause_icd10 %in% c("K701", "K702", "K703", "K704", "K705", "K706", "K707", "K708", "K709"), "icd_group"] <- "K70.0"
@@ -260,11 +259,10 @@ death_cause[death_cause$cause_icd10 %in% c("K711", "K712", "K713", "K714", "K715
 death_cause[death_cause$cause_icd10 %in% c("K721", "K722", "K723", "K724", "K725", "K726", "K727", "K728","K729"), "icd_group"] <- "K72.0"
 death_cause[death_cause$cause_icd10 %in% c("K731", "K732", "K733", "K734", "K735", "K736", "K737", "K738", "K739"), "icd_group"] <- "K73.0"
 death_cause[death_cause$cause_icd10 %in% c("K741", "K742", "K743", "K744", "K745", "K746", "K747", "K748", "K749"), "icd_group"] <- "K74.0"
-death_cause[death_cause$cause_icd10 %in% c("K751", "K752", "K753", "K754", "K755", "K756", "K757"), "icd_group"] <- "K75.0"
+death_cause[death_cause$cause_icd10 %in% c("K751", "K752", "K753", "K754", "K755", "K756", "K757", "K758", "K759"), "icd_group"] <- "K75.0"
 death_cause[death_cause$cause_icd10 %in% c("K761", "K762", "K763", "K764", "K765", "K766", "K767","K768", "K769"), "icd_group"] <- "K76.0"
 death_cause[death_cause$cause_icd10 %in% c("K771", "K772", "K773", "K774", "K705", "K776", "K777","K778", "K779"), "icd_group"] <- "K77.0"
 death_cause[death_cause$cause_icd10 %in% c("C221", "C222", "C223", "C224", "C225", "C226", "C227","C228", "C229"), "icd_group"] <- "C22.0"
-death_cause[death_cause$cause_icd10 == "K75.8", "icd_group"] <- "K75.8"
 
 death_cause[death_cause$icd_group %in% c("K70.0"), "icd_names"] <- "Alcoholic liver disease"
 death_cause[death_cause$icd_group %in% c("K71.0"), "icd_names"] <- "Toxic liver disease "
@@ -274,7 +272,6 @@ death_cause[death_cause$icd_group %in% c("K75.0"), "icd_names"] <- "Inflammatory
 death_cause[death_cause$icd_group %in% c("K75.8"), "icd_names"] <- "NASH"
 death_cause[death_cause$icd_group %in% c("K761", "K762", "K763", "K764", "K765", "K766", "K767"), "icd_names"] <- "Chronic Hepatitis MAFLD"
 death_cause[death_cause$icd_group %in% c("C22.0"), "icd_names"] <- "liver Malignant neoplasm"
-
 
 baseline_df[baseline_df$Diagnosis %in% c("K700", "K701", "K702", "K703", "K704", "K705", "K706", "K707", "K708", "K709"), "Diagnosis_grp"] <- "K70.0"
 baseline_df[baseline_df$Diagnosis %in% c("K710", "K711", "K712", "K713", "K714", "K715", "K716", "K717", "K718", "K719"), "Diagnosis_grp"] <- "K71.0"
