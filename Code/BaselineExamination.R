@@ -1,5 +1,4 @@
-# Death data with baseline examination: 
-# Read the required data files :
+# Death data with baseline examination: # Read the required data files :
 
 requirement <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baselineRequire.csv') %>% select('eid', 'X6138.0.0', 'X2443.0.0')
 covariates2 <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates2.csv') %>% select('eid', 'X21003.0.0', 'X20116.0.0', 'X20117.0.0')
@@ -9,16 +8,16 @@ metabolites_baseline <- metabolites %>% select('Eid', 'BMI', 'Sex', 'Ethnicity')
 
 baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baseline.csv')
 hypertension <- read.csv(file = 'C:/Users/User/Desktop/Data/hypertension_baseline.csv')
-nutritrion_df <- read.csv(file = 'C:/Users/User/Desktop/Data/nutritrion.csv')
+nutritrion <- read.csv(file = 'C:/Users/User/Desktop/Data/nutritrion.csv')
 
 # Rename column names :
 
-baseline_df<- as.data.frame(baseline_df[!duplicated(baseline_df$eid),])
+baseline_df <- as.data.frame(baseline_df[!duplicated(baseline_df$eid),])
 
 # Read another data file :
 
-#baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","21003-0.0","31-0.0","21001-0.0", "20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0"))
-#hypertension_baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv" ,select=c("eid", "21003-0.0", "31-0.0","20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0", "4080-0.0","4079-0.0"))
+# baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","21003-0.0","31-0.0","21001-0.0", "20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0"))
+# hypertension_baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv" ,select=c("eid", "21003-0.0", "31-0.0","20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0", "4080-0.0","4079-0.0"))
 # nutritrion <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","20089-0.0","1558-0.0","100580-0.0","1548-0.0","1309-0.0","1369-0.0","6164-0.0","1349-0.0","6144-0.0","1160-0.0","20090-0.0","4537-0.0","1930-0.0"))
 
 # setnames for hypertension baseline_df:
@@ -26,18 +25,17 @@ baseline_df<- as.data.frame(baseline_df[!duplicated(baseline_df$eid),])
 setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes'))
 setnames(hypertension, old = colnames(hypertension), new = c('eid','Age_AC', 'Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'Systolic_BP','Diastolic_BP'))
 Covariates2<- fread("ukb52200.csv", select=c("eid", "21000-0.0","21001-0.0"))
-setnames(nutritrion_df, old = colnames(nutritrion_df), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'meals', 'spz_diet', 'Alcohol_int_10y', 'Alcohol_int_fr','Alcohol_cons'))
+setnames(nutritrion, old = colnames(nutritrion), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'meals', 'spz_diet', 'Alcohol_int_10y', 'Alcohol_int_fr','Alcohol_cons'))
 
-# Create a new column for Systolic_BP categories
-# icd i11-15 observation 
+# Create a new column for Systolic_BP categories # icd i11-15 observation 
 
-hypertension_df <- hesin_diag %>% filter(Diagnosis >= 'i10' & Diagnosis <= 'i15')
 hypertension_fr <- subset(hesin_diag, startsWith(as.character(diag_icd10), 'I10') | startsWith(as.character(diag_icd10), 'I11') | startsWith(as.character(diag_icd10), 'I12') | startsWith(as.character(diag_icd10), 'I13')
                           | startsWith(as.character(diag_icd10), 'I14') | startsWith(as.character(diag_icd10), 'I15')) # ICD code filter
+hypertension_fr = hypertension_fr[!duplicated(hypertension_fr$eid_1), ]
 
 # K 70/77 merge with Liver disease df.
-hesin_diag$diag_icd10<-replace_na(hesin_diag$diag_icd10, 0)
 
+hesin_diag$diag_icd10<-replace_na(hesin_diag$diag_icd10, 0)
 patterns <- c("K70", "K71", "K72", "K73", "K74", "K75", "K76", "K77")
 regex_pattern <- paste0("^", paste(patterns, collapse = "|")) # regular expression pattern to match any of the patterns defined
 liverdisease <- hesin_diag %>% filter(substr(diag_icd10, 1, 3) >= 'K70' & substr(diag_icd10, 1, 3) <= 'K77')
@@ -52,7 +50,6 @@ hypertension$Systolic_Category <- cut(hypertension$Systolic_BP, breaks = c(-Inf,
 hypertension$Diastolic_Category <- cut(hypertension$Diastolic_BP, breaks = c(-Inf, 80, 89, 120, Inf), labels = c("Normal", "Stage 1", "Stage 2", "Stage 3"), include.lowest = TRUE)
 
 # Create the Hypertension column based on the conditions
-
 hypertension$Hypertension <- ifelse(hypertension$Systolic_BP >= 140 | hypertension$Diastolic_BP >= 90, 1, 0)
 
 # Rename column names :
