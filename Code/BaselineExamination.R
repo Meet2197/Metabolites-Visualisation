@@ -9,6 +9,7 @@ metabolites_baseline <- metabolites %>% select('Eid', 'BMI', 'Sex', 'Ethnicity')
 baseline_df <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/baseline.csv')
 hypertension <- read.csv(file = 'C:/Users/User/Desktop/Data/hypertension_baseline.csv')
 nutritrion <- read.csv(file = 'C:/Users/User/Desktop/Data/nutritrion.csv')
+init_exam <- read.csv(file = 'C:/Users/User/Desktop/Data/init.csv')
 
 # Rename column names :
 
@@ -16,9 +17,11 @@ baseline_df <- as.data.frame(baseline_df[!duplicated(baseline_df$eid),])
 
 # Read another data file :
 
-# baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","21003-0.0","31-0.0","21001-0.0", "20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0"))
+# baseline <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","21003-0.0","31-0.0","21001-0.0", "20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0"))
 # hypertension_baseline_df <- fread("C:/Users/User/Desktop/Data/ukb52200.csv" ,select=c("eid", "21003-0.0", "31-0.0","20116-0.0", "20117-0.0", "41270-0.0", "6138-0.0", "2443-0.0", "4080-0.0","4079-0.0"))
 # nutritrion <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","20089-0.0","1558-0.0","100580-0.0","1548-0.0","1309-0.0","1369-0.0","6164-0.0","1349-0.0","6144-0.0","1160-0.0","20090-0.0","4537-0.0","1930-0.0"))
+# covariates <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","30620-0.0","30650-0.0","30730-0.0"))
+# init_exam <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","53-0.0"))
 
 # setnames for hypertension baseline_df:
 
@@ -26,12 +29,13 @@ setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Age_AC', 'Gen
 setnames(hypertension, old = colnames(hypertension), new = c('eid','Age_AC', 'Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'Systolic_BP','Diastolic_BP'))
 Covariates2<- fread("ukb52200.csv", select=c("eid", "21000-0.0","21001-0.0"))
 setnames(nutritrion, old = colnames(nutritrion), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'meals', 'spz_diet', 'Alcohol_int_10y', 'Alcohol_int_fr','Alcohol_cons'))
+setnames(init_exam, old = colnames(init_exam), new = c('eid', 'init_exam'))
 
 # Create a new column for Systolic_BP categories # icd i11-15 observation 
 
 hypertension_fr <- subset(hesin_diag, startsWith(as.character(diag_icd10), 'I10') | startsWith(as.character(diag_icd10), 'I11') | startsWith(as.character(diag_icd10), 'I12') | startsWith(as.character(diag_icd10), 'I13')
                           | startsWith(as.character(diag_icd10), 'I14') | startsWith(as.character(diag_icd10), 'I15')) # ICD code filter
-hypertension_fr = hypertension_fr[!duplicated(hypertension_fr$eid_1), ]
+hypertension_fr = hypertension_fr[!duplicated(hypertension_fr$eid), ]
 
 # K 70/77 merge with Liver disease df.
 
@@ -116,4 +120,6 @@ vtree(filtered_bp2, c("Diagnosis", "Diabetes", "Drinking", "Smoking"), maxNodes 
 write.csv(baseline, "C:/Users/User/Desktop/PhD Documentation/My drafts/baseline_examination.csv", row.names = FALSE)
 write.csv(bp2, "C:/Users/User/Desktop/Data/baseline_data.csv", row.names = FALSE)
 write.csv(baseline_df, "C:/Users/User/Desktop/Data/Results/baseline.csv", row.names = FALSE)
+write.csv(covariates, "C:/Users/User/Desktop/Data/Results/covariates.csv", row.names = FALSE)
 write.csv(nutritrion, "C:/Users/User/Desktop/Data/nutritrion.csv", row.names = FALSE)
+write.csv(init_exam, "C:/Users/User/Desktop/Data/init.csv", row.names = FALSE)

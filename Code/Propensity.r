@@ -4,19 +4,20 @@ library(twang)
 library(ipw)
 library(caret)
 library(randomForest)
+library(survival)
 
-metformin_psm <- ALL[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','metformin', 'MASLD','nash','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd')]
+metformin_psm <- ALL[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')]
 metformin_psm <- subset(metformin_psm, Diabetes == 1)
-pioglitazone_psm1 <- ALL_pioglitazone[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','pioglitazone', 'MASLD','nash','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd')]
+pioglitazone_psm1 <- ALL_pioglitazone[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')]
 pioglitazone_psm <- subset(pioglitazone_psm1, Diabetes == 1)
-ramipril_psm <- ALL_ramipril[, c('eid','ramipril','Age_AC', 'Gender','BMI','Diabetes', "hypertension",'MASLD','nash','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd')]
+ramipril_psm <- ALL_ramipril[, c('eid','Age_AC', 'Gender','BMI','Diabetes','ramipril','hypertension','MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')]
 death_psm1 <- ALL_Death [, c("eid","metformin", "Diabetes", "Age_AC", "Gender", "BMI", "liverdisease","death")]
 
 # psm model for propensity score matching :
 
-psm_model1 <- matchit(metformin ~ Age_AC + Gender + BMI, data = metformin_psm, method = "nearest", ratio = 5)
-psm_model2 <- matchit(pioglitazone ~ Age_AC + Gender + BMI, data = pioglitazone_psm, method = "nearest", ratio = 5)
-psm_model3 <- matchit(ramipril ~  Diabetes + Age_AC + Gender + BMI + hypertension, data = ramipril_psm , method = "nearest", ratio = 5)
+psm_model1 <- matchit(metformin ~ Age_AC + Gender + BMI + ALT + GLS + AST + GGT, data = metformin_psm, method = "nearest", ratio = 5)
+psm_model2 <- matchit(pioglitazone ~ Age_AC + Gender + BMI + ALT + GLS + AST + GGT, data = pioglitazone_psm, method = "nearest", ratio = 5)
+psm_model3 <- matchit(ramipril ~  Diabetes + Age_AC + Gender + BMI + hypertension + ALT + GLS + AST + GGT, data = ramipril_psm , method = "nearest", ratio = 5)
 death_psm1 <- matchit(metformin ~ Age_AC + Gender + BMI + liverdisease + death, data = death_psm1, method = "nearest", ratio = 5)
 
 # View summary of the matching

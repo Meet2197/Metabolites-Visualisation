@@ -239,7 +239,7 @@ volcano_diabetes_Metformin <- plot_ly(all_diabetes_Metformin, x = ~smd, y = ~log
            list(type = "line", x0 = -0.3, x1 = 0.8, y0 = 10, y1 = 10, line = list(color = "red"))))
 volcano_diabetes_Metformin
 
-# nash Patients 
+# MASH Patients 
 
 metabolite_MASLD <-merge(matched1, metabolites, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
   select('eid','eid','TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLCL',
@@ -1221,17 +1221,17 @@ plot_diabetes_ramipril <- plot_ly(all_diabetes_ramipril, x = ~smd, y = ~logp, ty
                        list(type = "line", x0 = -0.06, x1 = 0.1, y0 = 0.5, y1 = 0.5, line = list(color = "red"))))
 plot_diabetes_ramipril
 
-# nash Patients with ramipril :
+# MASH Patients with ramipril :
 
-ramipril_nash <-merge(matched3, metabolites, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
+ramipril_MASH <-merge(matched3, metabolites, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
   select('eid','TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLCL',
          'PC','S','AB','A1','ABA1','TLFA','DU','O3FA','O6FA','PUFA','MUFA','SFA','LA','DHA','O3Tl','O6TL','PUTL','MUTL','STL','LATL','DCATL','PUMU','O63R','ALA','GLT','GLY','HIS','TLAA','ISO','LEU','VAL','PHA','TYR','GLS','LAC','PYR','CIT',
          'H3','ACT','ACTA','ATN','CTN','ALB','GPA','CMEL','LPEL','PCMEL','CCMEL','CECEL','FCMEL','TGEL',' VLV','TLVLV','PVLV','CVLV','CEVLV','FCVLV','TVLV','LV','TLPLV','PLV','CLV','CELV','FCLV','TGLV','MV','TLPMV','PMV','CMV','CEMV','FCMV',
          'TMV','SV','TLPSV','PSV','CSV','CESV','FCSV','TGSV','VSV','TLPVSV','PVSV','CVSV','CEVSV','FCVSV','TGVSV','I','TLPI','PI','CI','CEI','FCI','TGI','LL','TLPLL','PLL','CLL','CELL','FCLL','TGLL','ML','TLPML','PML','CML','CEML','FCML',
-         'TGML','SL','TLPSL','PSL','CSL','CESL','FCSL','TGSL','VLH','TLPVLH','PVLH','CVLH','CEVLH','FCVLH','TGVLH','LH','TLPLH','PLH','CLH','CELH','FCLH','TGLH','MH','TLPMH','PMH','CMHD','ramipril','nash')
+         'TGML','SL','TLPSL','PSL','CSL','CESL','FCSL','TGSL','VLH','TLPVLH','PVLH','CVLH','CEVLH','FCVLH','TGVLH','LH','TLPLH','PLH','CLH','CELH','FCLH','TGLH','MH','TLPMH','PMH','CMHD','ramipril','MASH')
 
-ramipril_nash <- ramipril_nash %>%
-  filter(nash == 1)
+ramipril_MASH <- ramipril_MASH %>%
+  filter(MASH == 1)
 
 summary14 <- function(x) {
   
@@ -1244,7 +1244,7 @@ summary14 <- function(x) {
   
   # Loop to create each row for the final table
   for (i in 1:num_vars) {  # Start from column 3, as columns 1 and 2 are assumed to be non-predictor columns
-    models[[i]] <- lm(x[[i]] ~ ramipril, data = ramipril_nash)
+    models[[i]] <- lm(x[[i]] ~ ramipril, data = ramipril_MASH)
     first_tables[[i]] <- broom::tidy(models[[i]])
   }  
   
@@ -1256,22 +1256,22 @@ summary14 <- function(x) {
 
 # Assuming 'ramipril' is a column in your df data frame with t test of whole dataframe: 
 
-final_table14 <- summary14(ramipril_nash[2:170])
+final_table14 <- summary14(ramipril_MASH[2:170])
 
 # ramipril filter with table : 
 
-final_table_nash <- subset(final_table14, term=="ramipril")
+final_table_MASH <- subset(final_table14, term=="ramipril")
 
 # P value generation of ramipril associated metabolites against log10. 
 
-final_table_nash$logp <- -(log10(final_table_nash$p.value))
-final_table_nash <- final_table_nash[-c(1,2,3,4,5)]  
+final_table_MASH$logp <- -(log10(final_table_MASH$p.value))
+final_table_MASH <- final_table_MASH[-c(1,2,3,4,5)]  
 
 # generate smd value. 
 
-smd_nash_ramipril <- apply(ramipril_nash[, 2:170], 2, function(x) {
-  group_means <- aggregate(x, list(ramipril_nash$ramipril), mean, na.rm = TRUE)
-  group_sds <- aggregate(x, list(ramipril_nash$ramipril), sd, na.rm = TRUE)
+smd_MASH_ramipril <- apply(ramipril_MASH[, 2:170], 2, function(x) {
+  group_means <- aggregate(x, list(ramipril_MASH$ramipril), mean, na.rm = TRUE)
+  group_sds <- aggregate(x, list(ramipril_MASH$ramipril), sd, na.rm = TRUE)
   
   # Extract standard deviations excluding the first column (group indicator)
   group_sds_values <- group_sds[, -1]
@@ -1294,66 +1294,66 @@ smd_nash_ramipril <- apply(ramipril_nash[, 2:170], 2, function(x) {
 
 # df generation
 
-smd_nash_ramipril <- data.frame(smd_nash_ramipril)
+smd_MASH_ramipril <- data.frame(smd_MASH_ramipril)
 
 # Adds new row to df
 
-smd_nash_ramipril[3,]=c(3,smd_nash_ramipril[2,-1]/smd_nash_ramipril[1,-1])
+smd_MASH_ramipril[3,]=c(3,smd_MASH_ramipril[2,-1]/smd_MASH_ramipril[1,-1])
 
 # Add another new row at index 4
-smd_nash_ramipril[4,] <- c(4, log2(smd_nash_ramipril[3,]))
+smd_MASH_ramipril[4,] <- c(4, log2(smd_MASH_ramipril[3,]))
 
 # Remove the first three rows
-t_smd_nash_ramipril<-as.data.frame(t(as.data.frame(smd_nash_ramipril)))
-t_smd_nash_ramipril<-t_smd_nash_ramipril[-c(1,2,3)]
+t_smd_MASH_ramipril<-as.data.frame(t(as.data.frame(smd_MASH_ramipril)))
+t_smd_MASH_ramipril<-t_smd_MASH_ramipril[-c(1,2,3)]
 
 # merging generated  smd and ramipril tables of above code:
-nash_ramipril<-cbind(t_smd_nash_ramipril, final_table_nash)
+MASH_ramipril<-cbind(t_smd_MASH_ramipril, final_table_MASH)
 
 # name change for smd 
-colnames(nash_ramipril)[colnames(nash_ramipril) == "4"] <- "smd"
+colnames(MASH_ramipril)[colnames(MASH_ramipril) == "4"] <- "smd"
 
 # Define significance threshold for p-value
 threshold <- 0.2
 
 # Volacno plot generation with ggplot with log 10 p value 
 
-nash_ramipril <- subset(nash_ramipril, logp >= 0 & logp <= 1.7 & smd >= -0.2 & smd <= 0.6)
-ggplot(nash_ramipril, aes(x = smd, y = logp)) +
+MASH_ramipril <- subset(MASH_ramipril, logp >= 0 & logp <= 1.7 & smd >= -0.2 & smd <= 0.6)
+ggplot(MASH_ramipril, aes(x = smd, y = logp)) +
   geom_point(aes(color = logp > threshold)) +
-  geom_text_repel(aes(label = rownames(nash_ramipril)),size = 2, box.padding = unit(0.25, "lines"), max.overlaps = 35) +
+  geom_text_repel(aes(label = rownames(MASH_ramipril)),size = 2, box.padding = unit(0.25, "lines"), max.overlaps = 35) +
   scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black")) +
-  labs(title = "Volcano Plot of ramipril consuming nash Patients",x = "Standard Mean Difference (SMD)",y = "-log10(p-value)") +
+  labs(title = "Volcano Plot of ramipril consuming MASH Patients",x = "Standard Mean Difference (SMD)",y = "-log10(p-value)") +
   coord_cartesian(ylim = c(0, 3)) +
   theme_minimal()
 
 # Plot ramipril 
-plot_ramipril_nash <- plot_ly(nash_ramipril, x = ~smd, y = ~logp, type = "scatter", mode = "markers",
-  marker = list(size = 7,color = ifelse(nash_ramipril$smd >= -0.05 & nash_ramipril$smd <= 0.05,"green", ifelse(nash_ramipril$smd > 0.05, "blue", "red"))),
-  text = ~paste("Observation:", rownames(nash_ramipril),"<br>", "SMD:", nash_ramipril$smd, "<br>", "-log10(p-value):", nash_ramipril$logp),showlegend = FALSE) %>%
+plot_ramipril_MASH <- plot_ly(MASH_ramipril, x = ~smd, y = ~logp, type = "scatter", mode = "markers",
+  marker = list(size = 7,color = ifelse(MASH_ramipril$smd >= -0.05 & MASH_ramipril$smd <= 0.05,"green", ifelse(MASH_ramipril$smd > 0.05, "blue", "red"))),
+  text = ~paste("Observation:", rownames(MASH_ramipril),"<br>", "SMD:", MASH_ramipril$smd, "<br>", "-log10(p-value):", MASH_ramipril$logp),showlegend = FALSE) %>%
   add_trace(x = NA, y = NA, type = "scatter", mode = "markers",  marker = list(size = 10, color = "green"), name = "SMD between -0.05 and 0.05") %>%
   add_trace(x = NA, y = NA, type = "scatter", mode = "markers", marker = list(size = 10, color = "blue"), name = "SMD > 0.05") %>%
   add_trace(x = NA, y = NA, type = "scatter", mode = "markers", marker = list(size = 10, color = "red"), name = "SMD < -0.05") %>%
-  add_trace(type = "scatter", mode = "text", text = ~rownames(nash_ramipril), hoverinfo = "text", textposition = "top center", showlegend = FALSE, textfont = list(size = 10)) %>%
-  layout(title = "Volcano Plot of nash  Patients consuming ramipril ", xaxis = list(title = "Standard Mean Difference (SMD)"), yaxis = list(title = "-log10(p-value)"),
+  add_trace(type = "scatter", mode = "text", text = ~rownames(MASH_ramipril), hoverinfo = "text", textposition = "top center", showlegend = FALSE, textfont = list(size = 10)) %>%
+  layout(title = "Volcano Plot of MASH  Patients consuming ramipril ", xaxis = list(title = "Standard Mean Difference (SMD)"), yaxis = list(title = "-log10(p-value)"),
   shapes = list(list(type = "line", x0 = -0.05, x1 = -0.05, y0 = 0, y1 = 1.7, line = list(color = "darkblue")),
   list(type = "line", x0 = 0.05, x1 = 0.05, y0 = 0, y1 = 1.7, line = list(color = "darkblue")),
   list(type = "line", x0 = -0.2, x1 = 0.6, y0 = 0.1, y1 = 0.1, line = list(color = "red"))))
-plot_ramipril_nash
+plot_ramipril_MASH
 
-# nash diabetic Patients consuming ramipril :
+# MASH diabetic Patients consuming ramipril :
 
-metabolite_nash_Diabetes <-merge(matched3, metabolites, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
+metabolite_MASH_Diabetes <-merge(matched3, metabolites, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
   select('eid','TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLCL',
          'PC','S','AB','A1','ABA1','TLFA','DU','O3FA','O6FA','PUFA','MUFA','SFA','LA','DHA','O3Tl','O6TL','PUTL','MUTL','STL','LATL','DCATL','PUMU','O63R','ALA','GLT','GLY','HIS','TLAA','ISO','LEU','VAL','PHA','TYR','GLS','LAC','PYR','CIT',
          'H3','ACT','ACTA','ATN','CTN','ALB','GPA','CMEL','LPEL','PCMEL','CCMEL','CECEL','FCMEL','TGEL',' VLV','TLVLV','PVLV','CVLV','CEVLV','FCVLV','TVLV','LV','TLPLV','PLV','CLV','CELV','FCLV','TGLV','MV','TLPMV','PMV','CMV','CEMV','FCMV',
          'TMV','SV','TLPSV','PSV','CSV','CESV','FCSV','TGSV','VSV','TLPVSV','PVSV','CVSV','CEVSV','FCVSV','TGVSV','I','TLPI','PI','CI','CEI','FCI','TGI','LL','TLPLL','PLL','CLL','CELL','FCLL','TGLL','ML','TLPML','PML','CML','CEML','FCML',
-         'TGML','SL','TLPSL','PSL','CSL','CESL','FCSL','TGSL','VLH','TLPVLH','PVLH','CVLH','CEVLH','FCVLH','TGVLH','LH','TLPLH','PLH','CLH','CELH','FCLH','TGLH','MH','TLPMH','PMH','CMHD','ramipril','nash','Diabetes')
+         'TGML','SL','TLPSL','PSL','CSL','CESL','FCSL','TGSL','VLH','TLPVLH','PVLH','CVLH','CEVLH','FCVLH','TGVLH','LH','TLPLH','PLH','CLH','CELH','FCLH','TGLH','MH','TLPMH','PMH','CMHD','ramipril','MASH','Diabetes')
 
-# nash and diabetes filter:
+# MASH and diabetes filter:
 
-metabolite_nash_Diabetes <- metabolite_nash_Diabetes %>%
-  filter(nash == 1, Diabetes == 1)
+metabolite_MASH_Diabetes <- metabolite_MASH_Diabetes %>%
+  filter(MASH == 1, Diabetes == 1)
 
 #Summary generation :
 
@@ -1368,7 +1368,7 @@ summary15 <- function(x) {
   
   # Loop to create each row for the final table
   for (i in 1:num_vars) {  # Start from column 3, as columns 1 and 2 are assumed to be non-predictor columns
-    models[[i]] <- lm(x[[i]] ~ ramipril, data = metabolite_nash_Diabetes)
+    models[[i]] <- lm(x[[i]] ~ ramipril, data = metabolite_MASH_Diabetes)
     first_tables[[i]] <- broom::tidy(models[[i]])
   }  
   
@@ -1380,23 +1380,23 @@ summary15 <- function(x) {
 
 # Assuming 'ramipril' is a column in your df data frame with t test of whole dataframe: 
 
-final_table15 <- summary15(metabolite_nash_Diabetes[2:170])
+final_table15 <- summary15(metabolite_MASH_Diabetes[2:170])
 
 # ramipril filter with table : 
 
-final_nash_Diabetes <- subset(final_table15, term=="ramipril")
+final_MASH_Diabetes <- subset(final_table15, term=="ramipril")
 
 # P value generation of pioglitazone associated metabolites against log10. 
 
 
-final_nash_Diabetes$logp <- -(log10(final_nash_Diabetes$p.value))
-final_nash_Diabetes <- final_nash_Diabetes[-c(1,2,3,4,5)]  
+final_MASH_Diabetes$logp <- -(log10(final_MASH_Diabetes$p.value))
+final_MASH_Diabetes <- final_MASH_Diabetes[-c(1,2,3,4,5)]  
 
 # generate smd value. 
 
-smd_nash_ramipril <- apply(metabolite_nash_Diabetes[, 2:170], 2, function(x) {
-  group_means <- aggregate(x, list(metabolite_nash_Diabetes$ramipril), mean, na.rm = TRUE)
-  group_sds <- aggregate(x, list(metabolite_nash_Diabetes$ramipril), sd, na.rm = TRUE)
+smd_MASH_ramipril <- apply(metabolite_MASH_Diabetes[, 2:170], 2, function(x) {
+  group_means <- aggregate(x, list(metabolite_MASH_Diabetes$ramipril), mean, na.rm = TRUE)
+  group_sds <- aggregate(x, list(metabolite_MASH_Diabetes$ramipril), sd, na.rm = TRUE)
   
   # Extract standard deviations excluding the first column (group indicator)
   group_sds_values <- group_sds[, -1]
@@ -1419,51 +1419,51 @@ smd_nash_ramipril <- apply(metabolite_nash_Diabetes[, 2:170], 2, function(x) {
 
 # df generation
 
-smd_nash_diabetes_df <- data.frame(smd_nash_ramipril)
+smd_MASH_diabetes_df <- data.frame(smd_MASH_ramipril)
 
 # Adds new row to df
 
-smd_nash_diabetes_df[3,]=c(3,smd_nash_diabetes_df[2,-1]/smd_nash_diabetes_df[1,-1])
+smd_MASH_diabetes_df[3,]=c(3,smd_MASH_diabetes_df[2,-1]/smd_MASH_diabetes_df[1,-1])
 
 # Add another new row at index 4
-smd_nash_diabetes_df[4,] <- c(4, log2(smd_nash_diabetes_df[3,]))
+smd_MASH_diabetes_df[4,] <- c(4, log2(smd_MASH_diabetes_df[3,]))
 
 # Remove the first three rows
-t_smd_nash_Diabetic<-as.data.frame(t(as.data.frame(smd_nash_diabetes_df)))
-t_smd_nash_Diabetic<-t_smd_nash_Diabetic[-c(1,2,3)]
+t_smd_MASH_Diabetic<-as.data.frame(t(as.data.frame(smd_MASH_diabetes_df)))
+t_smd_MASH_Diabetic<-t_smd_MASH_Diabetic[-c(1,2,3)]
 
 
 # merging generated  smd and ramipril tables of above code:
-all_nash_ramipril_Diabetic<-cbind(t_smd_nash_Diabetic, final_nash_Diabetes)
+all_MASH_ramipril_Diabetic<-cbind(t_smd_MASH_Diabetic, final_MASH_Diabetes)
 
 # name change for smd 
-colnames(all_nash_ramipril_Diabetic)[colnames(all_nash_ramipril_Diabetic) == "4"] <- "smd"
+colnames(all_MASH_ramipril_Diabetic)[colnames(all_MASH_ramipril_Diabetic) == "4"] <- "smd"
 
 # Define significance threshold for p-value
 threshold <- 0.05
 
 # Volacno plot generation with ggplot with log 10 p value 
 
-all_nash_ramipril_Diabetic <- subset(all_nash_ramipril_Diabetic, logp >= 0 & logp <= 2 & smd  >= -0.3 & smd <= 1.5)
-ggplot(all_nash_ramipril_Diabetic, aes(x = smd, y = logp)) +
+all_MASH_ramipril_Diabetic <- subset(all_MASH_ramipril_Diabetic, logp >= 0 & logp <= 2 & smd  >= -0.3 & smd <= 1.5)
+ggplot(all_MASH_ramipril_Diabetic, aes(x = smd, y = logp)) +
   geom_point(aes(color = logp > threshold)) +
-  geom_text_repel(aes(label = rownames(all_nash_ramipril_Diabetic)),size = 2, box.padding = unit(0.25, "lines"), max.overlaps = 35) +
+  geom_text_repel(aes(label = rownames(all_MASH_ramipril_Diabetic)),size = 2, box.padding = unit(0.25, "lines"), max.overlaps = 35) +
   scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black")) +
-  labs(title = "Volcano Plot of ramipril consuming nash Patients(Diabetic)",x = "Standard Mean Difference (SMD)",y = "-log10(p-value)") +
+  labs(title = "Volcano Plot of ramipril consuming MASH Patients(Diabetic)",x = "Standard Mean Difference (SMD)",y = "-log10(p-value)") +
   coord_cartesian(ylim = c(0, 3)) +
   theme_minimal()
 
 # Plot Ramipril : 
 
-plot_diabetes_ramipril_nash2 <- plot_ly(all_nash_ramipril_Diabetic, x = ~smd, y = ~logp, type = "scatter", mode = "markers",
-  marker = list(size = 7,color = ifelse(all_nash_ramipril_Diabetic$smd >= -0.05 & all_nash_ramipril_Diabetic$smd <= 0.05,"green", ifelse(all_nash_ramipril_Diabetic$smd > 0.05, "blue", "red"))),
-  text = ~paste("Observation:", rownames(all_nash_ramipril_Diabetic),"<br>", "SMD:", all_nash_ramipril_Diabetic$smd, "<br>", "-log10(p-value):", all_nash_ramipril_Diabetic$logp),showlegend = FALSE) %>%
+plot_diabetes_ramipril_MASH2 <- plot_ly(all_MASH_ramipril_Diabetic, x = ~smd, y = ~logp, type = "scatter", mode = "markers",
+  marker = list(size = 7,color = ifelse(all_MASH_ramipril_Diabetic$smd >= -0.05 & all_MASH_ramipril_Diabetic$smd <= 0.05,"green", ifelse(all_MASH_ramipril_Diabetic$smd > 0.05, "blue", "red"))),
+  text = ~paste("Observation:", rownames(all_MASH_ramipril_Diabetic),"<br>", "SMD:", all_MASH_ramipril_Diabetic$smd, "<br>", "-log10(p-value):", all_MASH_ramipril_Diabetic$logp),showlegend = FALSE) %>%
   add_trace(x = NA, y = NA, type = "scatter", mode = "markers",  marker = list(size = 10, color = "green"), name = "SMD between -0.05 and 0.05") %>%
   add_trace(x = NA, y = NA, type = "scatter", mode = "markers", marker = list(size = 10, color = "blue"), name = "SMD > 0.05") %>%
   add_trace(x = NA, y = NA, type = "scatter", mode = "markers", marker = list(size = 10, color = "red"), name = "SMD < -0.05") %>%
-  add_trace(type = "scatter", mode = "text", text = ~rownames(all_nash_ramipril_Diabetic), hoverinfo = "text", textposition = "top center", showlegend = FALSE, textfont = list(size = 10)) %>%
-  layout(title = "Volcano Plot of nash (Diabetic) Patients consuming ramipril ", xaxis = list(title = "Standard Mean Difference (SMD)"), yaxis = list(title = "-log10(p-value)"),
+  add_trace(type = "scatter", mode = "text", text = ~rownames(all_MASH_ramipril_Diabetic), hoverinfo = "text", textposition = "top center", showlegend = FALSE, textfont = list(size = 10)) %>%
+  layout(title = "Volcano Plot of MASH (Diabetic) Patients consuming ramipril ", xaxis = list(title = "Standard Mean Difference (SMD)"), yaxis = list(title = "-log10(p-value)"),
          shapes = list(list(type = "line", x0 = -0.05, x1 = -0.05, y0 = 0, y1 = 2, line = list(color = "darkblue")),
          list(type = "line", x0 = 0.05, x1 = 0.05, y0 = 0, y1 = 2, line = list(color = "darkblue")),
          list(type = "line", x0 = -0.3, x1 = 1.5, y0 = 0.1, y1 = 0.1, line = list(color = "red"))))
-plot_diabetes_ramipril_nash2
+plot_diabetes_ramipril_MASH2

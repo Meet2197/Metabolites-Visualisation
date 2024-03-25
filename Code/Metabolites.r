@@ -22,11 +22,12 @@ library(cobalt)
 # Read Text and CSV Files_the R Script
 
 medication <- read.csv(file = 'C:/Users/User/Desktop/Data/medication.csv')[ ,2:21]
-covariates <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates_Markus.csv')[ ,2:7]
+covariates2 <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates_Markus.csv') %>%
+  select('eid','X52.0.0')
 hesin_diag <- read.table(file = 'C:/Users/User/Desktop/Data/hesin_diag.txt' ,header = TRUE , sep = "\t" )%>% 
   select('requires.eid','ins_index','diag_icd10')
 hesin <- read.table(file = 'C:/Users/User/Desktop/Data/hesin.txt', header = TRUE , sep = "\t") %>% 
-  select('eid','ins_index','epistart','epiend','disdate','admidate')
+  select('eid','ins_index','epistart','epiend','epidur','disdate','admidate')
 metabolites <- read.csv(file = 'C:/Users/User/Desktop/Data/metabolites.csv')
 mri <- read.csv(file = 'C:/Users/User/Desktop/Data/MRI.csv')%>%
   select('eid','X40061.2.0')
@@ -34,8 +35,7 @@ death <- read.table(file = 'C:/Users/User/Desktop/Data/Endpoints/death/death.txt
   select('eid','ins_index','date_of_death')
 death_cause <- read.table(file = 'C:/Users/User/Desktop/Data/Endpoints/death/death_cause.txt', header = TRUE , sep = "\t")%>% 
   select('eid','ins_index','cause_icd10')
-covariates2 <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates_Meet2.csv') %>%
-  select('eid','X30620.0.0','X30650.0.0','X30730.0.0')
+covariates <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates.csv')
 genes <- read.csv(file = 'C:/Users/User/Desktop/Data/genes.csv') %>%
   select("eid","rs2642438_A","rs1260326_T","rs780094_T","rs72613567_TA","rs10069690_T","rs9272105_A",
          "rs2856718_T","rs7453920_A","rs3077_G","rs9277535_G","rs58542926_T","rs455804_A","rs738409_G")   
@@ -43,15 +43,13 @@ NASH <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/Nash.csv')
 
 # After setnames of metabolites:
 
-metabolite <- metabolites %>%
-  select('Eid','Ethnicity','BMI','Age','Sex')
+metabolite <- metabolites %>% select('Eid','Ethnicity','BMI','Age','Sex')
 
 # 'Total_Free_C','Clinical_LDL_C','HDL_C','Total_Triglycerides','Linoleic_Acid','Omega-3 _FA_','Omega-6__FA_','Triglycerides_VLDL', 'Triglycerides_LDL','Triglycerides_HDL','CE_CM and EL_VLDL','CE_VL_VLDL','CE_L_VLDL','CE_M_VLDL','CE_S_VLDL','CE_VS_VLDL','	CE_IDL','CE_L_LDL','CE_M_LDL','CE_S_LDL','CE_VL_HDL','CE_L_HDL','CE_L_HDL',
 
 # Mutation of data for Medication
  
-setnames(hesin_diag,"requires.eid",'eid_1')
-setnames(covariates, old=colnames(covariates), new = c('eid','Birth_Year','Birth_Month','BMI','Age_at_Obs.','Gender'))
+setnames(hesin_diag,"requires.eid",'eid')
 setnames(medication, old=colnames(medication), new = c('eid','Medications_1','Medications_2','Medications_3','Medications_4','Medications_5','Medications_6','Medications_7','Medications_8','Medications_9','Medications_10','Medications_11','Medications_12','Medications_13','Medications_14','Medications_15','Medications_16','Medications_17','Medications_18','Medications_19'))
 setnames(metabolites, old=colnames(metabolites), new = c('No.','eid','TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLCL',
                                                          'PC','S','AB','A1','ABA1','TLFA','DU','O3FA','O6FA','PUFA','MUFA','SFA','LA','DHA','O3Tl','O6TL','PUTL','MUTL','STL','LATL','DCATL','PUMU','O63R','ALA','GLT','GLY','HIS','TLAA','ISO','LEU','VAL','PHA','TYR','GLS','LAC','PYR','CIT',
@@ -59,7 +57,8 @@ setnames(metabolites, old=colnames(metabolites), new = c('No.','eid','TLC','TLHC
                                                          'TMV','SV','TLPSV','PSV','CSV','CESV','FCSV','TGSV','VSV','TLPVSV','PVSV','CVSV','CEVSV','FCVSV','TGVSV','I','TLPI','PI','CI','CEI','FCI','TGI','LL','TLPLL','PLL','CLL','CELL','FCLL','TGLL','ML','TLPML','PML','CML','CEML','FCML',
                                                          'TGML','SL','TLPSL','PSL','CSL','CESL','FCSL','TGSL','VLH','TLPVLH','PVLH','CVLH','CEVLH','FCVLH','TGVLH','LH','TLPLH','PLH','CLH','CELH','FCLH','TGLH','MH','TLPMH','PMH','CMHD','Ethnicity','BMI','Age','Sex'))
 setnames(mri,old=colnames(mri), new = c('eid',"Liver_fat"))
-setnames(covariates2,old=colnames(covariates2),new = c('eid','ALAT','ASAT','GGT'))
+setnames(covariates,old=colnames(covariates),new = c('eid','ALT','AST','GGT'))
+setnames(covariates2,old=colnames(covariates2),new = c('eid','init_exam'))
 setnames(death,"eid","eid_1")
 setnames(NASH,"X41202.0.0","icd_code")
 setnames(K760,"K760","Diagnosis")
@@ -87,15 +86,11 @@ diabetes <- na.omit(diabetes)
 
 # Sellectign columns form admissionP dataframe. 
 
-admissionP <- na.omit(hesin) %>%
-  select("eid","admidate")
+admissionP <- na.omit(hesin) %>% select("eid","admidate")
 
 # death info consists several columns mentioned below for MAFLD and NASH associated death.  
 
-death_info <- na.omit(df6) %>%
-  select("eid_1","date_of_death", "icd_group","icd_names")
-
-colnames(death_info)
+death_info <- na.omit(df6) %>% select("eid_1","date_of_death", "icd_group","icd_names")
 
 medication[is.na(medication)] <- simvastatin
 medication[medication == simvastatin] <- 0
@@ -112,7 +107,7 @@ df1 = merge(hesin_diag,hesin, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_ind
 common2 <- intersect(df1$eid_1, metabolites$Eid)
 df2_common = df1[common2, ]
 metabolites_common = metabolites[common2, ]
-df2 = merge(df1, metabolites, by.x=c('eid_1'), by.y=c('Eid')) %>%
+df2 = merge(df1, metabolites, by.x=c('eid_1'), by.y=c('Eid')) %>% 
   select('eid_1','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL','diag_icd10','icd_group')
 
 ## 1.2 Medications dataframe generation. 
@@ -126,22 +121,6 @@ df3 = merge(medication, df2, by.x=c('eid'), by.y=c('eid_1')) %>%
 df6 = merge(medication, df2, by.x=c('eid'), by.y=c('eid_1')) %>%
   select('eid','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL','diag_icd10','icd_group')
          
-# NASH icd code comaprison with Sub metabolites. 
-
-MAFLD_df <- subset(df2, startsWith(as.character(diag_icd10), 'K760'))
-Fibrosis_cirrhosis <- df2[df2$icd_group == 'K74.0' & !is.na(df2$icd_group), ]
-neoplasm <- df2[df2$icd_group == 'C22.0' & !is.na(df2$icd_group), ]
-no_liver_disease <- df2[!(df2$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0')), ]
-
-# Nash (K75.8) dataframe with metabolites columns to observe impact over NASH development.  
-
-NASH_dataframe <- intersect(NASH$eid, metabolites$Eid)
-nash_common = NASH[NASH_dataframe, ]
-metabolites_common = metabolites[NASH_dataframe, ]
-NASH_dataframe = merge(NASH,metabolites, by.x=c('eid'), by.y=c('Eid'))%>% 
-  select('eid','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Total_Esterified_C', 'Total_TG', 'Total_C', 'Apo_B','Apo_A1','P_HDL')
-NASH_df = NASH_dataframe[!duplicated(NASH_dataframe), ]
-
 # No medication Dataframe generated_calculations.R file with no usage of medications for NASH and MAFLD patients. 
 
 common4 <- intersect(df2$eid_1, No_Medication$eid)
@@ -247,11 +226,13 @@ hesin_diag[hesin_diag$diag_icd10 %in% c("K710", "K711", "K712", "K713", "K714", 
 hesin_diag[hesin_diag$diag_icd10 %in% c("K720", "K721", "K722", "K723", "K724", "K725", "K726", "K727", "K728", "K729"), "icd_group"] <- "K72.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K730", "K731", "K732", "K733", "K734", "K735", "K736", "K737", "K738", "K739"), "icd_group"] <- "K73.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K740", "K741", "K742", "K743", "K744", "K745", "K746", "K747", "K748", "K749"), "icd_group"] <- "K74.0"
-hesin_diag[hesin_diag$diag_icd10 %in% c("K750", "K751", "K752", "K753", "K754", "K755", "K756", "K757", "K758", "K759"), "icd_group"] <- "K75.0"
-hesin_diag[hesin_diag$diag_icd10 %in% c("K760", "K761", "K762", "K763", "K764", "K765", "K766", "K767", "K768", "K769"), "icd_group"] <- "K76.0"
+hesin_diag[hesin_diag$diag_icd10 %in% c("K750", "K751", "K752", "K753", "K754", "K755", "K756", "K757", "K759"), "icd_group"] <- "K75.0"
+hesin_diag[hesin_diag$diag_icd10 %in% c("K761", "K762", "K763", "K764", "K765", "K766", "K767", "K768", "K769"), "icd_group"] <- "K76.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K770", "K771", "K772", "K773", "K774", "K705", "K776", "K777", "K778", "K779"), "icd_group"] <- "K77.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K220", "K221", "K222", "K223", "K224", "K705", "K226", "K227", "K228", "K229"), "icd_group"] <- "C22.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K75.8"), "icd_group"] <- "K75.8"
+hesin_diag[hesin_diag$diag_icd10 %in% c("K76.0"), "icd_group"] <- "K76.0"
+
 # ICD CODE grouping
 
 death_cause[death_cause$cause_icd10 %in% c("K701", "K702", "K703", "K704", "K705", "K706", "K707", "K708", "K709"), "icd_group"] <- "K70.0"
