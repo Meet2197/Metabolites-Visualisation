@@ -171,10 +171,19 @@ ALL_Nutrition <- merge(nutritrion_df, liverdisease, by.x="eid", by.y="eid", all.
 hesin2 <- hesin %>% select('eid','epistart')
 hesin3 <- merge(hesin2, init_exam, by = "eid")
 hesin3$epi_diff = difftime(hesin3$init_exam,hesin3$epistart,units = "days")
-all_hazard <- merge(hesin3, ALL, by = "eid")
-all_hazard[is.na(all_hazard)] <- 0
+all_hazard <- merge(hesin3, ALL,  by.x="eid", all.x = TRUE)
 all_hazard <- as.data.frame(all_hazard[!duplicated(all_hazard$eid), ])
-all_hazard <- merge(all_hazard, liverdisease, by = "eid")
+all_hazard <- merge(all_hazard, liverdisease, by.x="eid", all.x = TRUE)
+
+all_hazard$liverdisease <-replace_na(all_hazard$liverdisease, 0)
+all_hazard$toxicliver <-replace_na(all_hazard$toxicliver, 0)
+all_hazard$ChronHepatitis <-replace_na(all_hazard$ChronHepatitis, 0)
+all_hazard$Liverfailure <-replace_na(all_hazard$Liverfailure, 0)
+all_hazard$fibrosecirrho <-replace_na(all_hazard$fibrosecirrho, 0)
+all_hazard$inflammliver <-replace_na(all_hazard$inflammliver, 0)
+all_hazard$otherliverD <-replace_na(all_hazard$otherliverD, 0)
+all_hazard$UnclassLiverd <-replace_na(all_hazard$UnclassLiverd, 0)
+
 
 # Fit Cox proportional hazards model
 
@@ -223,12 +232,6 @@ p_value6 <- summary(cox_model6)$coefficients["metformin", "Pr(>|z|)"]
 p_value7 <- summary(cox_model7)$coefficients["metformin", "Pr(>|z|)"]
 p_value8 <- summary(cox_model8)$coefficients["metformin", "Pr(>|z|)"]
 p_value9 <- summary(cox_model9)$coefficients["metformin", "Pr(>|z|)"]
-
-# Print results
-
-cat("Hazard Ratio:", hazard_ratio6, "\n")
-cat("Confidence Intervals (95%): [", conf_intervals6[1], ", ", conf_intervals6[2], "]\n")
-cat("P-Value:", p_value6, "\n")
 
 # Perform t-test for metformin patients: 
 

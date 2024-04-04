@@ -1,16 +1,12 @@
 library(MatchIt)
 library(cobalt)
 library(twang)
-library(ipw)
-library(caret)
-library(randomForest)
-library(survival)
 
-metformin_psm <- ALL[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')]
+metformin_psm <- ALL[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease')]
 metformin_psm <- subset(metformin_psm, Diabetes == 1)
-pioglitazone_psm1 <- ALL_pioglitazone[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')]
+pioglitazone_psm1 <- ALL_pioglitazone[, c('eid', 'Age_AC', 'Gender','BMI','Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease')]
 pioglitazone_psm <- subset(pioglitazone_psm1, Diabetes == 1)
-ramipril_psm <- ALL_ramipril[, c('eid','Age_AC', 'Gender','BMI','Diabetes','ramipril','hypertension','MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')]
+ramipril_psm <- ALL_ramipril[, c('eid','Age_AC', 'Gender','BMI','Diabetes','ramipril','hypertension','MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease')]
 death_psm1 <- ALL_Death [, c("eid","metformin", "Diabetes", "Age_AC", "Gender", "BMI", "liverdisease","death")]
 
 # psm model for propensity score matching :

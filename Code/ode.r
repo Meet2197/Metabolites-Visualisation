@@ -65,8 +65,6 @@ print(equilibrium_df)
 # Initial conditions from equilibrium values
 initial_state <- equilibrium_values # initial state of the system using the equilibrium values obtained earlier
 
-# Initial guess for parameters
-parameters_guess <- c(1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 # 3.2 we have fit the equilibrium state to the data.
 # Modifications :
@@ -134,6 +132,9 @@ opts <- list(algorithm = "NLOPT_LN_COBYLA")
 optim_results <- list()
 
 # Initial guess for parameters
+parameters_guess <- c(1, 2, 3, 3, 5, 6, 7, 8, 9)  # identifyiability
+
+# Initial guess for parameters
 parameters_guesses <- replicate(100, rep(1, 7), simplify = FALSE) # Initial guess for K1, K2, K4, K6, K7, K8, K9
 
 # Minimize objective function using nloptr for each initial guess
@@ -141,12 +142,51 @@ for (i in 1:100) {
   result <- nloptr(x0 = parameters_guesses[[i]], eval_f = objective_wrapper, opts = opts)
   optim_results[[i]] <- result$solution}
 
+# add : random guess 
+
 # Create a dataframe for the solutions
 df_solution <- data.frame(matrix(unlist(optim_results), ncol = 7, byrow = TRUE))
 colnames(df_solution) <- c("k1", "k2", "k4", "k6", "k7", "k8", "k9")
 
 # Print the optimized parameters
 print(df_solution)
+
+# identifyibility
+
+objective_wrapper2 <- function(params) {
+  equilibrium_state <- calculate_equilibrium(c(k1 = params[1], k2 = params[2], k4 = params[3],
+                                               k6 = params[4], k7 = params[5], k8 = params[6],
+                                               k9 = params[7], alpha = 0.6, beta = 0.5, gamma = 0.7,
+                                               C , T , E , B , P))
+  sum((equilibrium_state - equilibrium_values)^2)}
+
+# Set optimization options
+opts <- list(algorithm = "NLOPT_LN_COBYLA")
+
+# Initialize a list to store the results
+optim_results <- list()
+
+# Initial guess for parameters
+parameters_guess <- c(1, 2, 3, 3, 5, 6, 7, 8, 9)  # identifyiability
+
+# Initial guess for parameters
+parameters_guesses <- replicate(100, rep(1, 7), simplify = FALSE) # Initial guess for K1, K2, K4, K6, K7, K8, K9
+
+# Minimize objective function using nloptr for each initial guess
+for (i in 1:100) {
+  result <- nloptr(x0 = parameters_guesses[[i]], eval_f = objective_wrapper, opts = opts)
+  optim_results[[i]] <- result$solution}
+
+# add : random guess 
+
+# Create a dataframe for the solutions
+df_solution <- data.frame(matrix(unlist(optim_results), ncol = 7, byrow = TRUE))
+colnames(df_solution) <- c("k1", "k2", "k4", "k6", "k7", "k8", "k9")
+
+# Print the optimized parameters
+print(df_solution)
+
+
 
 # Iterate over each set of parameters from df_solution and solve the ODE system
 solutions_list <- list()  # Initialize a list to store solutions for each set of parameters

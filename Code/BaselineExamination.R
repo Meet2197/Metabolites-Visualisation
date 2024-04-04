@@ -23,6 +23,7 @@ baseline_df <- as.data.frame(baseline_df[!duplicated(baseline_df$eid),])
 # covariates <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","30620-0.0","30650-0.0","30730-0.0"))
 # init_exam <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","53-0.0"))
 
+
 # setnames for hypertension baseline_df:
 
 setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes'))
