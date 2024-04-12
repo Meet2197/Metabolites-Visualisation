@@ -36,9 +36,9 @@ death <- read.table(file = 'C:/Users/User/Desktop/Data/Endpoints/death/death.txt
 death_cause <- read.table(file = 'C:/Users/User/Desktop/Data/Endpoints/death/death_cause.txt', header = TRUE , sep = "\t")%>% 
   select('eid','ins_index','cause_icd10')
 covariates <- read.csv(file = 'C:/Users/User/Desktop/Data/covariates.csv')
-genes <- read.csv(file = 'C:/Users/User/Desktop/Data/genes.csv') %>%
-  select("eid","rs2642438_A","rs1260326_T","rs780094_T","rs72613567_TA","rs10069690_T","rs9272105_A",
-         "rs2856718_T","rs7453920_A","rs3077_G","rs9277535_G","rs58542926_T","rs455804_A","rs738409_G")   
+genes <- read.csv(file = 'C:/Users/User/Desktop/Data/genes.csv')  %>%
+  select("eid","rs2642438_A","rs1260326_T","rs780094_T","rs72613567_TA","rs10069690_T","rs9272105_A","rs2856718_T","rs7453920_A","rs3077_G",
+         "rs9277535_G","rs58542926_T","rs455804_A","rs738409_G")  
 NASH <- read.csv(file = 'C:/Users/User/Desktop/Data/Results/Nash.csv')
 
 # After setnames of metabolites:
@@ -130,44 +130,10 @@ healthy_df = merge(df2, No_Medication, by.x=c('eid_1'), by.y=c('eid')) %>%
   select('L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL')
 
 healthy_df = healthy_df[!duplicated(healthy_df), ]
-count(metformin_df)
-
-write.csv(metformin_table, "C:/Users/User/Desktop/Data/Results/metformin_table.csv", row.names=FALSE)
-write.csv(negative_control_data_table, "C:/Users/User/Desktop/Data/Results/non_metformin_dt.csv", row.names=FALSE)
-
-
 healthy_metformin_df <- metformin_df[!(metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0')), ]
 diagnosed_metformin_df <- metformin_df[metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0'), ]
 MAFLD_df <- diagnosed_metformin_df[diagnosed_metformin_df$icd_group == 'K76.0', ]
 
-#Frequency
-frequency_MAFLD_nonmetformin_df <- (nrow(MAFLD_df) / count) * 100
-NASH_df <- metformin_df[metformin_df$diag_icd10 == 'K758', ]
-frequency_NASH_df <- (nrow(MAFLD_df) / 91338) * 100 
-
-# non-metformin : 
-
-non_metformin_rows <- df3[rowSums(df3[, grepl("Medications_", names(df3))] == "metformin", na.rm = TRUE) == 0, ]
-non_metformin_df <- non_metformin_rows[, c('eid', 'icd_group', 'diag_icd10', grep("Medications_", names(df3), value = TRUE))]
-non_metformin_df = non_metformin_df[!duplicated(non_metformin_df), ]
-healthy_nonmetformin_df <- non_metformin_df[!(non_metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0')), ]
-diagnosed_nonmetformin_df  <- non_metformin_df[non_metformin_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0', 'C22.0'), ]
-MAFLD_nonmetformin_df <- diagnosed_nonmetformin_df[diagnosed_nonmetformin_df$icd_group == 'K76.0', ]
-frequency_MAFLD_nonmetformin_df <- (nrow(MAFLD_nonmetformin_df) / 91338) * 100
-
-## 1.3 Covariates file include baseline with intersect with df3. 
-
-common4 <- intersect(df3$Eid, covariates$Eid_1)
-df3_common = df3[common4, ]
-covariates_common = covariates[common4, ]
-df4 = merge(covariates, df3, by.x=c('Eid_1'), by.y=c('Eid'))
-
-## 1.4 MRI data intersect df3.
-
-common5 <- intersect(df4$Eid_1 , mri$eid)
-df4_common = df4[common5, ]
-mri_common = mri[common5,]
-df5 = merge(df3, mri, by.x=c('Eid_1'), by.y=c('eid'))
 
 ## 1.5 Death cause and death dataframe intersect to observe cause of NAFLD and MAFLD. 
 
@@ -176,6 +142,7 @@ death_common = death[common6, ]
 death_cause_common = death_cause[common6,]
 death_df = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
 death_df = death_df[!duplicated(death_df$eid_1), ]
+
 NASH_death <- death_df[death_df$cause_icd10 == "K758", ]
 MASLD_death <- death_df[death_df$cause_icd10 == "K760", ]
 
@@ -227,7 +194,7 @@ hesin_diag[hesin_diag$diag_icd10 %in% c("K720", "K721", "K722", "K723", "K724", 
 hesin_diag[hesin_diag$diag_icd10 %in% c("K730", "K731", "K732", "K733", "K734", "K735", "K736", "K737", "K738", "K739"), "icd_group"] <- "K73.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K740", "K741", "K742", "K743", "K744", "K745", "K746", "K747", "K748", "K749"), "icd_group"] <- "K74.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K750", "K751", "K752", "K753", "K754", "K755", "K756", "K757", "K759"), "icd_group"] <- "K75.0"
-hesin_diag[hesin_diag$diag_icd10 %in% c("K760", "K761", "K762", "K763", "K764", "K765", "K766", "K767", "K768", "K769"), "icd_group"] <- "K76.0"
+hesin_diag[hesin_diag$diag_icd10 %in% c("K761", "K762", "K763", "K764", "K765", "K766", "K767", "K768", "K769"), "icd_group"] <- "K76.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K770", "K771", "K772", "K773", "K774", "K705", "K776", "K777", "K778", "K779"), "icd_group"] <- "K77.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K220", "K221", "K222", "K223", "K224", "K705", "K226", "K227", "K228", "K229"), "icd_group"] <- "C22.0"
 hesin_diag[hesin_diag$diag_icd10 %in% c("K75.8"), "icd_group"] <- "K75.8"
@@ -253,14 +220,3 @@ death_cause[death_cause$icd_group %in% c("K75.0"), "icd_names"] <- "Inflammatory
 death_cause[death_cause$icd_group %in% c("K75.8"), "icd_names"] <- "NASH"
 death_cause[death_cause$icd_group %in% c("K761", "K762", "K763", "K764", "K765", "K766", "K767"), "icd_names"] <- "Chronic Hepatitis MAFLD"
 death_cause[death_cause$icd_group %in% c("C22.0"), "icd_names"] <- "liver Malignant neoplasm"
-
-baseline_df[baseline_df$Diagnosis %in% c("K700", "K701", "K702", "K703", "K704", "K705", "K706", "K707", "K708", "K709"), "Diagnosis_grp"] <- "K70.0"
-baseline_df[baseline_df$Diagnosis %in% c("K710", "K711", "K712", "K713", "K714", "K715", "K716", "K717", "K718", "K719"), "Diagnosis_grp"] <- "K71.0"
-baseline_df[baseline_df$Diagnosis %in% c("K720", "K721", "K722", "K723", "K724", "K725", "K726", "K727", "K728", "K729"), "Diagnosis_grp"] <- "K72.0"
-baseline_df[baseline_df$Diagnosis %in% c("K730", "K731", "K732", "K733", "K734", "K735", "K736", "K737", "K738", "K739"), "Diagnosis_grp"] <- "K73.0"
-baseline_df[baseline_df$Diagnosis %in% c("K740", "K741", "K742", "K743", "K744", "K745", "K746", "K747", "K748", "K749"), "Diagnosis_grp"] <- "K74.0"
-baseline_df[baseline_df$Diagnosis %in% c("K750", "K751", "K752", "K753", "K754", "K755", "K756", "K757", "K759"), "Diagnosis_grp"] <- "K75.0"
-baseline_df[baseline_df$Diagnosis %in% c("K760", "K761", "K762", "K763", "K764", "K765", "K766", "K767", "K768", "K769"), "Diagnosis_grp"] <- "K76.0"
-baseline_df[baseline_df$Diagnosis %in% c("K770", "K771", "K772", "K773", "K774", "K705", "K776", "K777", "K778", "K779"), "Diagnosis_grp"] <- "K77.0"
-baseline_df[baseline_df$Diagnosis %in% c("C220", "C221", "C222", "C223", "C224", "C705", "C226", "C227", "C228", "C229"), "Diagnosis_grp"] <- "C22.0"
-baseline_df[baseline_df$Diagnosis == "K75.8", "Diagnosis_grp"] <- "K75.8"
