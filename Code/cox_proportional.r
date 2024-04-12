@@ -78,23 +78,93 @@ cox_model_pio9 <- coxph(Surv(epidiff, UnclassLiverd) ~ pioglitazone, data = all_
 
 # Extract hazard ratio
 
-hazard_ratios <- c(exp(coef(cox_model_pio1)),exp(coef(cox_model_pio2)), exp(coef(cox_model_pio3)),exp(coef(cox_model_pio4)), exp(coef(cox_model_pio5)),
-                   exp(coef(cox_model_pio6)), exp(coef(cox_model_pio7)), exp(coef(cox_model_pio8)), exp(coef(cox_model_pio9)))
+hazard_ratio1 <- c(exp(coef(cox_model_pio1)))
+hazard_ratio2 <- c(exp(coef(cox_model_pio2)))
+hazard_ratio3 <- c(exp(coef(cox_model_pio3)))
+hazard_ratio4 <- c(exp(coef(cox_model_pio4)))
+hazard_ratio5 <- c(exp(coef(cox_model_pio5)))
+hazard_ratio6 <- c(exp(coef(cox_model_pio6)))
+hazard_ratio7 <- c(exp(coef(cox_model_pio7))) 
+hazard_ratio8 <- c(exp(coef(cox_model_pio8)))
+hazard_ratio9 <- c(exp(coef(cox_model_pio9)))
 
 # Calculate confidence intervals
-conf_intervals <- rbind(exp(confint(cox_model_pio1)), exp(confint(cox_model_pio2)), exp(confint(cox_model_pio3)), exp(confint(cox_model_pio4)),
-                        exp(confint(cox_model_pio5)), exp(confint(cox_model_pio6)), exp(confint(cox_model_pio7)), exp(confint(cox_model_pio8)),exp(confint(cox_model_pio9)))
+conf_intervals1 <- rbind(exp(confint(cox_model_pio1)))
+conf_intervals2 <- rbind(exp(confint(cox_model_pio2)))
+conf_intervals3 <- rbind(exp(confint(cox_model_pio3)))
+conf_intervals4 <- rbind(exp(confint(cox_model_pio4)))
+conf_intervals5 <- rbind(exp(confint(cox_model_pio5)))
+conf_intervals6 <- rbind(exp(confint(cox_model_pio6)))
+conf_intervals7 <- rbind(exp(confint(cox_model_pio7)))
+conf_intervals8 <- rbind(exp(confint(cox_model_pio8)))
+conf_intervals9 <- rbind(exp(confint(cox_model_pio9)))
 
 # Extract p-values
-p_values <- c( summary(cox_model_pio1)$coefficients["pioglitazone", "Pr(>|z|)"], summary(cox_model_pio2)$coefficients["pioglitazone", "Pr(>|z|)"],
-               summary(cox_model_pio3)$coefficients["pioglitazone", "Pr(>|z|)"], summary(cox_model_pio4)$coefficients["pioglitazone", "Pr(>|z|)"],
-               summary(cox_model_pio5)$coefficients["pioglitazone", "Pr(>|z|)"], summary(cox_model_pio6)$coefficients["pioglitazone", "Pr(>|z|)"],
-               summary(cox_model_pio7)$coefficients["pioglitazone", "Pr(>|z|)"], summary(cox_model_pio8)$coefficients["pioglitazone", "Pr(>|z|)"],
-               summary(cox_model_pio9)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values1 <- c(summary(cox_model_pio1)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values2 <- c(summary(cox_model_pio2)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values3 <- c(summary(cox_model_pio3)$coefficients["pioglitazone", "Pr(>|z|)"]) 
+p_values4 <- c(summary(cox_model_pio4)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values5 <- c(summary(cox_model_pio5)$coefficients["pioglitazone", "Pr(>|z|)"]) 
+p_values6 <- c(summary(cox_model_pio6)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values7 <- c(summary(cox_model_pio7)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values8 <- c(summary(cox_model_pio8)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values9 <- c(summary(cox_model_pio9)$coefficients["pioglitazone", "Pr(>|z|)"])
+
+
+# Cox proportional hazard ratio for Pioglitazone:
+
+all_hazard3 <- merge(hesin3, ALL_pioglitazone,  by.x="eid", all.x = TRUE)
+all_hazard3 <- as.data.frame(all_hazard3[!duplicated(all_hazard3$eid), ])
+
+# Fit Cox proportional hazards model
+
+cox_model_ram1 <- coxph(Surv(epidiff, liverdisease) ~ pioglitazone, data = all_hazard3)
+cox_model_ram2 <- coxph(Surv(epidiff, alcoholicliver) ~ pioglitazone, data = all_hazard3)
+cox_model_ram3 <- coxph(Surv(epidiff, toxicliver) ~ pioglitazone, data = all_hazard3)
+cox_model_ram4 <- coxph(Surv(epidiff, Liverfailure) ~ pioglitazone, data = all_hazard3)
+cox_model_ram5 <- coxph(Surv(epidiff, ChronHepatitis) ~ pioglitazone, data = all_hazard3)
+cox_model_ram6 <- coxph(Surv(epidiff, fibrosecirrho) ~ pioglitazone, data = all_hazard3)
+cox_model_ram7 <- coxph(Surv(epidiff, inflammliver) ~ pioglitazone, data = all_hazard3)
+cox_model_ram8 <- coxph(Surv(epidiff, otherliverD) ~ pioglitazone, data = all_hazard3)
+cox_model_ram9 <- coxph(Surv(epidiff, UnclassLiverd) ~ pioglitazone, data = all_hazard3)
+
+# Extract hazard ratio
+
+hazard_ratio1 <- c(exp(coef(cox_model_ram1)))
+hazard_ratio2 <- c(exp(coef(cox_model_ram2)))
+hazard_ratio3 <- c(exp(coef(cox_model_ram3)))
+hazard_ratio4 <- c(exp(coef(cox_model_ram4)))
+hazard_ratio5 <- c(exp(coef(cox_model_ram5)))
+hazard_ratio6 <- c(exp(coef(cox_model_ram6)))
+hazard_ratio7 <- c(exp(coef(cox_model_ram7))) 
+hazard_ratio8 <- c(exp(coef(cox_model_ram8)))
+hazard_ratio9 <- c(exp(coef(cox_model_ram9)))
+
+# Calculate confidence intervals
+conf_intervals1 <- rbind(exp(confint(cox_model_ram1)))
+conf_intervals2 <- rbind(exp(confint(cox_model_ram2)))
+conf_intervals3 <- rbind(exp(confint(cox_model_ram3)))
+conf_intervals4 <- rbind(exp(confint(cox_model_ram4)))
+conf_intervals5 <- rbind(exp(confint(cox_model_ram5)))
+conf_intervals6 <- rbind(exp(confint(cox_model_ram6)))
+conf_intervals7 <- rbind(exp(confint(cox_model_ram7)))
+conf_intervals8 <- rbind(exp(confint(cox_model_ram8)))
+conf_intervals9 <- rbind(exp(confint(cox_model_ram9)))
+
+# Extract p-values
+p_values1 <- c(summary(cox_model_ram1)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values2 <- c(summary(cox_model_ram2)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values3 <- c(summary(cox_model_ram3)$coefficients["pioglitazone", "Pr(>|z|)"]) 
+p_values4 <- c(summary(cox_model_ram4)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values5 <- c(summary(cox_model_ram5)$coefficients["pioglitazone", "Pr(>|z|)"]) 
+p_values6 <- c(summary(cox_model_ram6)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values7 <- c(summary(cox_model_ram7)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values8 <- c(summary(cox_model_ram8)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values9 <- c(summary(cox_model_ram9)$coefficients["pioglitazone", "Pr(>|z|)"])
 
 
 # Fit survival curve
-surv_obj <- survfit(Surv(epidiff, death) ~ 1, data = all_hazard2)
+surv_obj <- survfit(Surv(epidiff, death) ~ 1, data = all_hazard3)
 
 # Plot survival curve with customized settings
 plot(surv_obj, xlab = "Years", ylab = "Survival Probability", main = "Survival Curve for Patients with Liver Disease",

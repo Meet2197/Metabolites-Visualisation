@@ -153,12 +153,14 @@ print(df_solution)
 
 # identifyibility
 
+# Define the objective function wrapper
 objective_wrapper2 <- function(params) {
   equilibrium_state <- calculate_equilibrium(c(k1 = params[1], k2 = params[2], k4 = params[3],
                                                k6 = params[4], k7 = params[5], k8 = params[6],
                                                k9 = params[7], alpha = 0.6, beta = 0.5, gamma = 0.7,
                                                C , T , E , B , P))
-  sum((equilibrium_state - equilibrium_values)^2)}
+  sum((equilibrium_state - equilibrium_values)^2)
+}
 
 # Set optimization options
 opts <- list(algorithm = "NLOPT_LN_COBYLA")
@@ -166,26 +168,25 @@ opts <- list(algorithm = "NLOPT_LN_COBYLA")
 # Initialize a list to store the results
 optim_results <- list()
 
-# Initial guess for parameters
-parameters_guess <- c(1, 2, 3, 3, 5, 6, 7, 8, 9)  # identifyiability
-
-# Initial guess for parameters
-parameters_guesses <- replicate(100, rep(1, 7), simplify = FALSE) # Initial guess for K1, K2, K4, K6, K7, K8, K9
+# Number of initial guesses
+num_guesses <- 100
 
 # Minimize objective function using nloptr for each initial guess
-for (i in 1:100) {
-  result <- nloptr(x0 = parameters_guesses[[i]], eval_f = objective_wrapper, opts = opts)
-  optim_results[[i]] <- result$solution}
-
-# add : random guess 
+for (i in 1:num_guesses) {
+  # Generate random initial guesses for parameters
+  parameters_guess3 <- runif(7, min = 0, max = 10)  # Adjust min and max values as needed
+  
+  # Perform optimization
+  result <- nloptr(x0 = parameters_guess3, eval_f = objective_wrapper2, opts = opts)
+  optim_results[[i]] <- result$solution
+}
 
 # Create a dataframe for the solutions
-df_solution <- data.frame(matrix(unlist(optim_results), ncol = 7, byrow = TRUE))
-colnames(df_solution) <- c("k1", "k2", "k4", "k6", "k7", "k8", "k9")
+df_solution3 <- data.frame(matrix(unlist(optim_results), ncol = 7, byrow = TRUE))
+colnames(df_solution3) <- c("k1", "k2", "k4", "k6", "k7", "k8", "k9")
 
 # Print the optimized parameters
-print(df_solution)
-
+print(df_solution3)
 
 
 # Iterate over each set of parameters from df_solution and solve the ODE system

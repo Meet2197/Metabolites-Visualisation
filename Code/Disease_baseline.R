@@ -57,6 +57,11 @@ MASH <- as.data.frame(MASH[!duplicated(MASH$eid), ])
 MASH$Diagnosis <- 'K758'
 MASH <- select(MASH, c(eid, Diagnosis))
 
+# liver related Mortality
+
+mortality_df <- death_df[death_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0'), ]
+setnames(mortality_df,"eid_1","eid")
+
 # Toxic liver:
 
 Alcoholic_liver <- hesin_diag %>% subset(startsWith(as.character(icd_group), 'K70.0')) %>% distinct(eid, .keep_all = TRUE) %>% mutate(icd_group = 'K70.0') %>% select(eid, icd_group)
@@ -80,8 +85,9 @@ Unclassified_Liverd <- hesin_diag %>% subset(startsWith(as.character(icd_group),
 # ALT covariates:
 
 covariates <- covariates %>% select('eid','ALT','AST','GGT')
-metabolites2 <- metabolites %>% select('eid','GLS')
-metacov <- merge(covariates, metabolites2, by.x="eid", all.x = TRUE) %>% select('eid','ALT','GLS','AST','GGT')
+glucose <- read.csv(file = 'C:/Users/User/Desktop/Data/Labs.csv') %>% select('eid','X3Glucose')
+setnames(glucose,"X3Glucose","glucose")
+metacov <- merge(covariates, glucose, by.x="eid", all.x = TRUE) %>% select('eid','ALT','GLS','AST','GGT')
 
 #ALL Liver disease:
 
@@ -104,8 +110,7 @@ hypertension_fr$hypertension<-replace_na(hypertension_fr$hypertension, 0) # repl
 # liver disease :
 
 liverdisease <- as.data.frame(liverdisease[!duplicated(liverdisease$eid), ])
-liverdisease <- liverdisease %>%
-  select('eid','diag_icd10')
+liverdisease <- liverdisease %>% select('eid','diag_icd10')
 
 # IDs to use
 
@@ -115,7 +120,7 @@ MASH$MASH <-1
 pioglitazone$pioglitazone <-1
 ramipril$ramipril <-1
 hypertension_fr$hypertension <-1
-death_df$death <-1
+mortality_df$death <-1
 liverdisease$liverdisease <- 1 
 Alcoholic_liver$alcoholicliver <- 1
 Toxic_liver$toxicliver <- 1
@@ -134,6 +139,10 @@ ALL <-merge(MASLD_merge, metformin, by.x="eid", all.x = TRUE) %>% select('eid', 
          'Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd')
 ALL <-merge(ALL, metacov, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
          'Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')
+ALL <-merge(ALL, liverdisease, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
+         'Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease')
+ALL <-merge(ALL, mortality_df, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
+            'Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death')
 
 # pioglitazone merge with MASLD and MASH :
 
@@ -142,6 +151,8 @@ ALL_pioglitazone <-merge(ALL_pioglitazone, All_liver, by.x="eid", by.y="eid", al
          'Drinking', 'Qualifications', 'Diabetes','pioglitazone', 'MASLD', 'MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd')
 ALL_pioglitazone <-merge(ALL_pioglitazone, metacov, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
             'Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')
+ALL_pioglitazone <-merge(ALL_pioglitazone, liverdisease, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
+         'Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease')
 
 # Ramipril merge with ALL database :
 
@@ -153,6 +164,9 @@ ALL_ramipril <-merge(ALL_ramipril, hypertension_fr, by.x="eid", by.y="eid", all.
        'Drinking', 'Qualifications','hypertension', 'Diabetes','ramipril','MASLD', 'MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','hypertension')
 ALL_ramipril <-merge(ALL_ramipril, metacov, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
        'hypertension','Diabetes','ramipril', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT')
+ALL_ramipril <-merge(ALL_ramipril, liverdisease, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
+      'hypertension','Diabetes','ramipril', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease')
+
 
 # death df from MASLD and MASH death of patients : 
 
@@ -166,72 +180,36 @@ ALL_Death <-merge(ALL_Death, All_liver, by.x="eid", by.y="eid", all.x = TRUE )  
 ALL_Nutrition <- merge(nutritrion_df, liverdisease, by.x="eid", by.y="eid", all.x = TRUE, all.y = TRUE) %>%
   select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications', 'Diabetes','liverdisease','meals', 'spz_diet', 'Alcohol_int_10y', 'Alcohol_int_fr','Alcohol_cons')
 
-# Survival 
 
-hesin2 <- hesin %>% select('eid','epistart')
-hesin3 <- merge(hesin2, init_exam, by = "eid")
-hesin3$epi_diff = difftime(hesin3$init_exam,hesin3$epistart,units = "days")
-all_hazard <- merge(hesin3, ALL,  by.x="eid", all.x = TRUE)
-all_hazard <- as.data.frame(all_hazard[!duplicated(all_hazard$eid), ])
-all_hazard <- merge(all_hazard, liverdisease, by.x="eid", all.x = TRUE)
+# NAs to transform into 0 for ramipril medication:
 
-all_hazard$liverdisease <-replace_na(all_hazard$liverdisease, 0)
-all_hazard$toxicliver <-replace_na(all_hazard$toxicliver, 0)
-all_hazard$ChronHepatitis <-replace_na(all_hazard$ChronHepatitis, 0)
-all_hazard$Liverfailure <-replace_na(all_hazard$Liverfailure, 0)
-all_hazard$fibrosecirrho <-replace_na(all_hazard$fibrosecirrho, 0)
-all_hazard$inflammliver <-replace_na(all_hazard$inflammliver, 0)
-all_hazard$otherliverD <-replace_na(all_hazard$otherliverD, 0)
-all_hazard$UnclassLiverd <-replace_na(all_hazard$UnclassLiverd, 0)
+ALL_ramipril[is.na(ALL_ramipril)] <- 0
+ALL_ramipril$Diabetes[ALL_ramipril$Diabetes == -3 | ALL_ramipril$Diabetes == -1 | is.na(ALL_ramipril$Diabetes)] <- 0
+ALL_ramipril$ramipril <-replace_na(ALL_ramipril$ramipril, 0)
 
+# for metformin replace NAs to 0 :
 
-# Fit Cox proportional hazards model
+ALL[is.na(ALL)] <- 0
+ALL$Diabetes[ALL$Diabetes == -3 | ALL$Diabetes == -1 | is.na(ALL$Diabetes)] <- 0
+ALL$metformin <-replace_na(ALL$metformin, 0)
+ALL$death <-replace_na(ALL$death, 0)
 
-cox_model1 <- coxph(Surv(epi_diff, liverdisease) ~ metformin, data = all_hazard)
-cox_model2 <- coxph(Surv(epi_diff, alcoholicliver) ~ metformin, data = all_hazard)
-cox_model3 <- coxph(Surv(epi_diff, toxicliver) ~ metformin, data = all_hazard)
-cox_model4 <- coxph(Surv(epi_diff, Liverfailure) ~ metformin, data = all_hazard)
-cox_model5 <- coxph(Surv(epi_diff, ChronHepatitis) ~ metformin, data = all_hazard)
-cox_model6 <- coxph(Surv(epi_diff, fibrosecirrho) ~ metformin, data = all_hazard)
-cox_model7 <- coxph(Surv(epi_diff, inflammliver) ~ metformin, data = all_hazard)
-cox_model8 <- coxph(Surv(epi_diff, otherliverD) ~ metformin, data = all_hazard)
-cox_model9 <- coxph(Surv(epi_diff, UnclassLiverd) ~ metformin, data = all_hazard)
+# Nutrition NAs :
+ALL_Nutrition[is.na(ALL_Nutrition)] <- 0
 
-# Extract hazard ratio
+# death NAs to convert 
+ALL_Death$death <-replace_na(ALL_Death$death, 0) # death df 
+ALL_Death$liverdisease <-replace_na(ALL_Death$liverdisease, 0)
 
-hazard_ratio1 <- exp(coef(cox_model1))
-hazard_ratio2 <- exp(coef(cox_model2))
-hazard_ratio3 <- exp(coef(cox_model3))
-hazard_ratio4 <- exp(coef(cox_model4))
-hazard_ratio5 <- exp(coef(cox_model5))
-hazard_ratio6 <- exp(coef(cox_model6))
-hazard_ratio7 <- exp(coef(cox_model7))
-hazard_ratio8 <- exp(coef(cox_model8))
-hazard_ratio9 <- exp(coef(cox_model9))
+# NAs to transform into 0 for pioglitazone medication:
 
-# Calculate confidence intervals
+ALL_pioglitazone[is.na(ALL_pioglitazone)] <- 0
+ALL_pioglitazone$Diabetes[ALL_pioglitazone$Diabetes == -3 | ALL_pioglitazone$Diabetes == -1 | is.na(ALL_pioglitazone$Diabetes)] <- 0
+ALL_pioglitazone$pioglitazone <-replace_na(ALL_pioglitazone$pioglitazone, 0)
 
-conf_intervals1 <- exp(confint(cox_model1))
-conf_intervals2 <- exp(confint(cox_model2))
-conf_intervals3 <- exp(confint(cox_model3))
-conf_intervals4 <- exp(confint(cox_model4))
-conf_intervals5 <- exp(confint(cox_model5))
-conf_intervals6 <- exp(confint(cox_model6))
-conf_intervals7 <- exp(confint(cox_model7))
-conf_intervals8 <- exp(confint(cox_model8))
-conf_intervals9 <- exp(confint(cox_model9))
-
-# Extract p-value
-
-p_value1 <- summary(cox_model1)$coefficients["metformin", "Pr(>|z|)"]
-p_value2 <- summary(cox_model2)$coefficients["metformin", "Pr(>|z|)"]
-p_value3 <- summary(cox_model3)$coefficients["metformin", "Pr(>|z|)"]
-p_value4 <- summary(cox_model4)$coefficients["metformin", "Pr(>|z|)"]
-p_value5 <- summary(cox_model5)$coefficients["metformin", "Pr(>|z|)"]
-p_value6 <- summary(cox_model6)$coefficients["metformin", "Pr(>|z|)"]
-p_value7 <- summary(cox_model7)$coefficients["metformin", "Pr(>|z|)"]
-p_value8 <- summary(cox_model8)$coefficients["metformin", "Pr(>|z|)"]
-p_value9 <- summary(cox_model9)$coefficients["metformin", "Pr(>|z|)"]
+# matched all medications, survival curve for liver related mortality
+# AUC RUC curve kaplan maier 
+# 5% high or lower 
 
 # Perform t-test for metformin patients: 
 
@@ -243,11 +221,6 @@ BMI_t_test_metformin <- t.test(ALL$metformin , ALL$BMI)
 MASLD_t_test <- t.test(ALL$metformin, ALL$MASLD)
 MASH_t_test <- t.test(ALL$metformin, ALL$MASH)
 
-# NAs to transform into 0 for pioglitazone medication:
-
-ALL_pioglitazone[is.na(ALL_pioglitazone)] <- 0
-ALL_pioglitazone$Diabetes[ALL_pioglitazone$Diabetes == -3 | ALL_pioglitazone$Diabetes == -1 | is.na(ALL_pioglitazone$Diabetes)] <- 0
-
 #Pioglitazone t test for p value
 
 MASLD_ttest_Pioglitazone <- t.test(ALL_pioglitazone$pioglitazone , ALL_pioglitazone$MASLD)
@@ -255,25 +228,6 @@ MASH_ttest_Pioglitazone <- t.test(ALL_pioglitazone$pioglitazone , ALL_pioglitazo
 Gender_ttest_Pioglitazone <- t.test(ALL_pioglitazone$pioglitazone , ALL_pioglitazone$Gender)
 diabetes_ttest_Pioglitazone <- t.test(ALL_pioglitazone$pioglitazone ,ALL_pioglitazone$Diabetes)
 BMI_ttest_Pioglitazone <- t.test(ALL_pioglitazone$pioglitazone , ALL_pioglitazone$BMI)
-
-# NAs to transform into 0 for ramipril medication:
-
-ALL_ramipril[is.na(ALL_ramipril)] <- 0
-ALL_ramipril$Diabetes[ALL_ramipril$Diabetes == -3 | ALL_ramipril$Diabetes == -1 | is.na(ALL_ramipril$Diabetes)] <- 0
-
-# for metformin replace NAs to 0 :
-
-ALL[is.na(ALL)] <- 0
-ALL$Diabetes[ALL$Diabetes == -3 | ALL$Diabetes == -1 | is.na(ALL$Diabetes)] <- 0
-ALL$metformin <-replace_na(ALL$metformin, 0)
-
-
-# Nutrition NAs :
-ALL_Nutrition[is.na(ALL_Nutrition)] <- 0
-
-# death NAs to convert 
-ALL_Death$death <-replace_na(ALL_Death$death, 0) # death df 
-ALL_Death$liverdisease <-replace_na(ALL_Death$liverdisease, 0)
 
 # Ramipril :
 
@@ -304,6 +258,19 @@ ramipril_GLS2 <- sd(matched31$GLS,na.rm = TRUE)
 ramipril_GLS3 <- mean(matched32$GLS,na.rm = TRUE)
 ramipril_GLS4 <- sd(matched32$GLS,na.rm = TRUE)
 
+# Calculate mean and standard deviation of AST : 
+ramipril_AST1 <- mean(matched31$AST,na.rm = TRUE)
+ramipril_AST2 <- sd(matched31$AST,na.rm = TRUE)
+ramipril_AST3 <- mean(matched32$AST,na.rm = TRUE)
+ramipril_AST4 <- sd(matched32$AST,na.rm = TRUE)
+
+# Calculate mean and standard deviation of GGT : 
+ramipril_GGT1 <- mean(matched31$GGT,na.rm = TRUE)
+ramipril_GGT2 <- sd(matched31$GGT,na.rm = TRUE)
+ramipril_GGT3 <- mean(matched32$GGT,na.rm = TRUE)
+ramipril_GGT4 <- sd(matched32$GGT,na.rm = TRUE)
+
+
 # Calculate standardized mean difference (SMD) for age
 sd_age_ramipril <- sqrt((ramipril_age2^2 + ramipril_age4^2) / 2)
 smd_age_ramipril <- (ramipril_age1 - ramipril_age3) / sd_age_ramipril
@@ -317,9 +284,16 @@ sd_ALT_ramipril <- sqrt((ramipril_ALT2^2 + ramipril_ALT4^2) / 2)
 smd_ALT_ramipril <- (ramipril_ALT1 - ramipril_ALT3) / sd_ALT_ramipril
 
 # Calculate standardized mean difference (SMD) for GLS:
+sd_AST_ramipril <- sqrt((ramipril_AST2^2 + ramipril_AST4^2) / 2)
+smd_AST_ramipril <- (ramipril_AST1 - ramipril_AST3) / sd_AST_ramipril
+
+# Calculate standardized mean difference (SMD) for AST:
+sd_GGT_ramipril <- sqrt((ramipril_GGT2^2 + ramipril_GGT4^2) / 2)
+smd_GGT_ramipril <- (ramipril_GGT1 - ramipril_GGT3) / sd_GGT_ramipril
+
+# Calculate standardized mean difference (SMD) for GGT:
 sd_GLS_ramipril <- sqrt((ramipril_GLS2^2 + ramipril_GLS4^2) / 2)
 smd_GLS_ramipril <- (ramipril_GLS1 - ramipril_GLS3) / sd_GLS_ramipril
-
 
 # Male female calculation ramipril intake:
 
@@ -434,6 +408,18 @@ pioglitazone_ALT2 <- sd(matched21$ALT,na.rm = TRUE)
 pioglitazone_ALT3 <- mean(matched22$ALT,na.rm = TRUE)
 pioglitazone_ALT4 <- sd(matched22$ALT,na.rm = TRUE)
 
+# AST:
+pioglitazone_AST1 <- mean(matched21$AST,na.rm = TRUE)
+pioglitazone_AST2 <- sd(matched21$AST,na.rm = TRUE)
+pioglitazone_AST3 <- mean(matched22$AST,na.rm = TRUE)
+pioglitazone_AST4 <- sd(matched22$AST,na.rm = TRUE)
+
+# GGT 
+pioglitazone_GGT1 <- mean(matched21$GGT,na.rm = TRUE)
+pioglitazone_GGT2 <- sd(matched21$GGT,na.rm = TRUE)
+pioglitazone_GGT3 <- mean(matched22$GGT,na.rm = TRUE)
+pioglitazone_GGT4 <- sd(matched22$GGT,na.rm = TRUE)
+
 # Glucose:
 pioglitazone_GLS1 <- mean(matched21$GLS,na.rm = TRUE)
 pioglitazone_GLS2 <- sd(matched21$GLS,na.rm = TRUE)
@@ -448,13 +434,21 @@ pioglitazone_smd_age <- (pioglitazone_age1 - pioglitazone_age3) / pooled_sd_age 
 pooled_sd_bmi <- sqrt((pioglitazone_BMI2^2 + pioglitazone_BMI4^2) / 2)
 pioglitazone_smd_bmi <- (pioglitazone_BMI1 - pioglitazone_BMI3) / pooled_sd_bmi # Standardized mean difference for BMI
 
-# Pooled standard deviation for age
+# Pooled standard deviation for ALT
 pioglitazone_sd_ALT <- sqrt((pioglitazone_ALT2^2 + pioglitazone_ALT4^2) / 2)
 pioglitazone_smd_ALT <- (pioglitazone_ALT1 - pioglitazone_ALT3) / pioglitazone_sd_ALT #Standardized mean difference for age
 
-# Pooled standard deviation for age
+# Pooled standard deviation for Glucose
 pioglitazone_sd_GLS <- sqrt((pioglitazone_GLS2^2 + pioglitazone_GLS4^2) / 2)
 pioglitazone_smd_GLS <- (pioglitazone_GLS1 - pioglitazone_GLS3) / pioglitazone_sd_GLS #Standardized mean difference for age
+
+# Pooled standard deviation for AST
+pioglitazone_sd_AST <- sqrt((pioglitazone_AST2^2 + pioglitazone_AST4^2) / 2)
+pioglitazone_smd_AST <- (pioglitazone_AST1 - pioglitazone_AST3) / pioglitazone_sd_AST #Standardized mean difference for age
+
+# Pooled standard deviation for GGT
+pioglitazone_sd_GGT <- sqrt((pioglitazone_GGT2^2 + pioglitazone_GGT4^2) / 2)
+pioglitazone_smd_GGT <- (pioglitazone_GGT1 - pioglitazone_GGT3) / pioglitazone_sd_GGT #Standardized mean difference for age
 
 
 # Male female calculation pioglitazone intake:
@@ -589,10 +583,26 @@ metformin_sd_ALT <- sd(matched1_metformin$ALT)
 nonmetformin_mean_ALT <- mean(matched1_nonmetformin$ALT)
 nonmetformin_sd_ALT <- sd(matched1_nonmetformin$ALT)
 
-# Calculate pooled standard deviation
-metformin_sd_ALT <- sqrt((metformin_sd_ALT^2 + nonmetformin_sd_ALT^2) / 2)
-smd_ALT <- (metformin_mean_ALT - nonmetformin_mean_ALT) / metformin_sd_ALT
+# GGT matched mean and SD for metformin and nonmetformin :
+metformin_mean_GGT <- mean(matched1_metformin$GGT)
+metformin_sd_GGT <- sd(matched1_metformin$GGT)
+nonmetformin_mean_GGT <- mean(matched1_nonmetformin$GGT)
+nonmetformin_sd_GGT <- sd(matched1_nonmetformin$GGT)
 
+# Calculate pooled standard deviation
+metformin_sd_GGT <- sqrt((metformin_sd_GGT^2 + nonmetformin_sd_GGT^2) / 2)
+smd_GGT <- (metformin_mean_GGT - nonmetformin_mean_GGT) / metformin_sd_GGT
+
+# AST matched mean and SD for metformin and nonmetformin :
+
+metformin_mean_AST <- mean(matched1_metformin$AST)
+metformin_sd_AST <- sd(matched1_metformin$AST)
+nonmetformin_mean_AST <- mean(matched1_nonmetformin$AST)
+nonmetformin_sd_AST <- sd(matched1_nonmetformin$AST)
+
+# Calculate pooled standard deviation
+metformin_sd_AST <- sqrt((metformin_sd_AST^2 + nonmetformin_sd_AST^2) / 2)
+smd_AST <- (metformin_mean_AST - nonmetformin_mean_AST) / metformin_sd_AST
 
 # Age matched mean and SD :
 
