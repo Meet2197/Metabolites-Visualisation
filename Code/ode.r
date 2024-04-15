@@ -159,8 +159,7 @@ objective_wrapper2 <- function(params) {
                                                k6 = params[4], k7 = params[5], k8 = params[6],
                                                k9 = params[7], alpha = 0.6, beta = 0.5, gamma = 0.7,
                                                C , T , E , B , P))
-  sum((equilibrium_state - equilibrium_values)^2)
-}
+  sum((equilibrium_state - equilibrium_values)^2)}
 
 # Set optimization options
 opts <- list(algorithm = "NLOPT_LN_COBYLA")
@@ -187,8 +186,6 @@ colnames(df_solution3) <- c("k1", "k2", "k4", "k6", "k7", "k8", "k9")
 
 # Print the optimized parameters
 print(df_solution3)
-
-
 # Iterate over each set of parameters from df_solution and solve the ODE system
 solutions_list <- list()  # Initialize a list to store solutions for each set of parameters
 
