@@ -22,13 +22,13 @@ baseline_df <- as.data.frame(baseline_df[!duplicated(baseline_df$eid),])
 # nutritrion <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","20089-0.0","1558-0.0","100580-0.0","1548-0.0","1309-0.0","1369-0.0","6164-0.0","1349-0.0","6144-0.0","1160-0.0","20090-0.0","4537-0.0","1930-0.0"))
 # covariates <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","30620-0.0","30650-0.0","30730-0.0"))
 # init_exam <- fread("C:/Users/User/Desktop/Data/ukb52200.csv", select=c("eid","53-0.0"))
+# Covariates2<- fread("ukb52200.csv", select=c("eid", "21000-0.0","21001-0.0"))
 
 
 # setnames for hypertension baseline_df:
 
 setnames(baseline_df, old = colnames(baseline_df), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes'))
 setnames(hypertension, old = colnames(hypertension), new = c('eid','Age_AC', 'Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'Systolic_BP','Diastolic_BP'))
-Covariates2<- fread("ukb52200.csv", select=c("eid", "21000-0.0","21001-0.0"))
 setnames(nutritrion, old = colnames(nutritrion), new = c('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking','Diagnosis', 'Qualifications', 'Diabetes', 'meals', 'spz_diet', 'Alcohol_int_10y', 'Alcohol_int_fr','Alcohol_cons'))
 setnames(init_exam, old = colnames(init_exam), new = c('eid', 'init_exam'))
 

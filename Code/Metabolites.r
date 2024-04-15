@@ -111,16 +111,6 @@ df2 = merge(df1, metabolites, by.x=c('eid_1'), by.y=c('Eid')) %>%
   select('eid_1','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL','diag_icd10','icd_group')
 
 ## 1.2 Medications dataframe generation. 
-
-common3 <- intersect(df2$eid_1, medication$eid)
-df3_common = df2[common3, ]
-medication_common = medication[common3, ]
-df3 = merge(medication, df2, by.x=c('eid'), by.y=c('eid_1')) %>%
-  select('eid','Medications_1','Medications_2','Medications_3','Medications_4','Medications_5','Medications_6','Medications_7','Medications_8','Medications_9','Medications_10','Medications_11','Medications_12','Medications_13','Medications_14','Medications_15','Medications_16','Medications_17','Medications_18','Medications_19','diag_icd10','icd_group')
-
-df6 = merge(medication, df2, by.x=c('eid'), by.y=c('eid_1')) %>%
-  select('eid','L_HDL', 'M_HDL', 'L_VLDL', 'VS_VLDL', 'IDL', 'S_LDL', 'TG_HDL', 'TG_LDL', 'TG_VLDL', 'TG_IDL', 'VLDL_C', 'HDL_C', 'LDL_C', 'C_IDL', 'CE_VLDL', 'CE_LDL', 'CE_HDL', 'CE_IDL', 'Tl_Esterified_C', 'Tl_TG', 'Tl_C', 'Apo_B','Apo_A1','P_HDL','diag_icd10','icd_group')
-         
 # No medication Dataframe generated_calculations.R file with no usage of medications for NASH and MAFLD patients. 
 
 common4 <- intersect(df2$eid_1, No_Medication$eid)
@@ -135,13 +125,20 @@ diagnosed_metformin_df <- metformin_df[metformin_df$icd_group %in% c('K70.0', 'K
 MAFLD_df <- diagnosed_metformin_df[diagnosed_metformin_df$icd_group == 'K76.0', ]
 
 
+# MRI data:
+
+mri <- mri %>% mutate(low_fat = ifelse(Liver_fat < 5, Liver_fat, NA), high_fat = ifelse(Liver_fat > 5, Liver_fat, NA))
+
+# If you want to replace NA with 0, you can use na_if() function
+mri <- mri %>% mutate(low_fat = na_if(low_fat, NA), high_fat = na_if(high_fat, NA))
+mri <- mri %>% select(-Liver_fat) # If you want to remove the original "fat" column, you can use select() function
+
 ## 1.5 Death cause and death dataframe intersect to observe cause of NAFLD and MAFLD. 
 
 common6 <- intersect(death$eid_1 , death_cause$eid)
 death_common = death[common6, ]
 death_cause_common = death_cause[common6,]
-death_df = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
-death_df = death_df[!duplicated(death_df$eid_1), ]
+death_df = merge(death, death_cause, by.x=c('eid','ins_index'), by.y=c('eid','ins_index'))
 
 NASH_death <- death_df[death_df$cause_icd10 == "K758", ]
 MASLD_death <- death_df[death_df$cause_icd10 == "K760", ]

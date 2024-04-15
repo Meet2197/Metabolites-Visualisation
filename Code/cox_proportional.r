@@ -1,8 +1,11 @@
 library(randomForest)
 library(survival)
+library(forestplot)
+library(survminer)
+library(grid)
 
 # Create labels for forest plot
-labels <- c("liverdisease","alcoholicliver","toxicliver","Liverfailure","ChronHepatitis","fibrosecirrho","inflammliver","otherliverD","UnclassLiverd")
+labels <- c("liverdisease","alcoholicliver","toxicliver","Liverfailure","ChronHepatitis","fibrosecirrho","inflammliver","otherliverD","UnclassLiverd","MASH","MASLD")
 
 # NAs to replace :
 
@@ -41,23 +44,50 @@ cox_model6 <- coxph(Surv(epidiff, fibrosecirrho) ~ metformin, data = all_hazard)
 cox_model7 <- coxph(Surv(epidiff, inflammliver) ~ metformin, data = all_hazard)
 cox_model8 <- coxph(Surv(epidiff, otherliverD) ~ metformin, data = all_hazard)
 cox_model9 <- coxph(Surv(epidiff, UnclassLiverd) ~ metformin, data = all_hazard)
+cox_model10 <- coxph(Surv(epidiff, MASLD) ~ metformin, data = all_hazard)
+cox_model11 <- coxph(Surv(epidiff, MASH) ~ metformin, data = all_hazard)
 
 # Extract hazard ratio
 
-hazard_ratios <- c(exp(coef(cox_model1)),exp(coef(cox_model2)), exp(coef(cox_model3)),exp(coef(cox_model4)), exp(coef(cox_model5)),
-                   exp(coef(cox_model6)), exp(coef(cox_model7)), exp(coef(cox_model8)), exp(coef(cox_model9)))
+hazard_ratio1 <- c(exp(coef(cox_model1)))
+hazard_ratio2 <- c(exp(coef(cox_model2)))
+hazard_ratio3 <- c(exp(coef(cox_model3)))
+hazard_ratio4 <- c(exp(coef(cox_model4)))
+hazard_ratio5 <- c(exp(coef(cox_model5)))
+hazard_ratio6 <- c(exp(coef(cox_model6)))
+hazard_ratio7 <- c(exp(coef(cox_model7)))
+hazard_ratio8 <- c(exp(coef(cox_model8)))
+hazard_ratio9 <- c(exp(coef(cox_model9)))
+hazard_ratio10 <- c(exp(coef(cox_model10)))
+hazard_ratio11 <- c(exp(coef(cox_model11)))
 
 # Calculate confidence intervals
-conf_intervals <- rbind(exp(confint(cox_model1)), exp(confint(cox_model2)), exp(confint(cox_model3)), exp(confint(cox_model4)),
-                        exp(confint(cox_model5)), exp(confint(cox_model6)), exp(confint(cox_model7)), exp(confint(cox_model8)),exp(confint(cox_model9)))
+
+conf_interval1 <- rbind(exp(confint(cox_model1)))
+conf_interval2 <- rbind(exp(confint(cox_model2)))
+conf_interval3 <- rbind(exp(confint(cox_model3)))
+conf_interval4 <- rbind(exp(confint(cox_model4)))
+conf_interval5 <- rbind(exp(confint(cox_model5)))
+conf_interval6 <- rbind(exp(confint(cox_model6))) 
+conf_interval7 <- rbind(exp(confint(cox_model7))) 
+conf_interval8 <- rbind(exp(confint(cox_model8)))
+conf_interval9 <- rbind(exp(confint(cox_model9)))
+conf_interval10 <- rbind(exp(confint(cox_model10)))
+conf_interval11 <- rbind(exp(confint(cox_model11)))
 
 # Extract p-values
 
-p_values <- c( summary(cox_model1)$coefficients["metformin", "Pr(>|z|)"], summary(cox_model2)$coefficients["metformin", "Pr(>|z|)"],
-               summary(cox_model3)$coefficients["metformin", "Pr(>|z|)"], summary(cox_model4)$coefficients["metformin", "Pr(>|z|)"],
-               summary(cox_model5)$coefficients["metformin", "Pr(>|z|)"], summary(cox_model6)$coefficients["metformin", "Pr(>|z|)"],
-               summary(cox_model7)$coefficients["metformin", "Pr(>|z|)"], summary(cox_model8)$coefficients["metformin", "Pr(>|z|)"],
-               summary(cox_model9)$coefficients["metformin", "Pr(>|z|)"])
+p_value1 <- c(summary(cox_model1)$coefficients["metformin", "Pr(>|z|)"])
+p_value2 <- c(summary(cox_model2)$coefficients["metformin", "Pr(>|z|)"])
+p_value3 <- c(summary(cox_model3)$coefficients["metformin", "Pr(>|z|)"])
+p_value4 <- c(summary(cox_model4)$coefficients["metformin", "Pr(>|z|)"])
+p_value5 <- c(summary(cox_model5)$coefficients["metformin", "Pr(>|z|)"])
+p_value6 <- c(summary(cox_model6)$coefficients["metformin", "Pr(>|z|)"])
+p_value7 <- c(summary(cox_model7)$coefficients["metformin", "Pr(>|z|)"])
+p_value8 <- c(summary(cox_model8)$coefficients["metformin", "Pr(>|z|)"])
+p_value9 <- c(summary(cox_model9)$coefficients["metformin", "Pr(>|z|)"])
+p_value10 <- c(summary(cox_model10)$coefficients["metformin", "Pr(>|z|)"])
+p_value11 <- c(summary(cox_model11)$coefficients["metformin", "Pr(>|z|)"])
 
 # Cox proportional hazard ratio for Pioglitazone:
 
@@ -75,6 +105,8 @@ cox_model_pio6 <- coxph(Surv(epidiff, fibrosecirrho) ~ pioglitazone, data = all_
 cox_model_pio7 <- coxph(Surv(epidiff, inflammliver) ~ pioglitazone, data = all_hazard2)
 cox_model_pio8 <- coxph(Surv(epidiff, otherliverD) ~ pioglitazone, data = all_hazard2)
 cox_model_pio9 <- coxph(Surv(epidiff, UnclassLiverd) ~ pioglitazone, data = all_hazard2)
+cox_model_pio10 <- coxph(Surv(epidiff, MASLD) ~ pioglitazone, data = all_hazard2)
+cox_model_pio11 <- coxph(Surv(epidiff, MASH) ~ pioglitazone, data = all_hazard2)
 
 # Extract hazard ratio
 
@@ -87,6 +119,9 @@ hazard_ratio6 <- c(exp(coef(cox_model_pio6)))
 hazard_ratio7 <- c(exp(coef(cox_model_pio7))) 
 hazard_ratio8 <- c(exp(coef(cox_model_pio8)))
 hazard_ratio9 <- c(exp(coef(cox_model_pio9)))
+hazard_ratio10 <- c(exp(coef(cox_model_pio10)))
+hazard_ratio11 <- c(exp(coef(cox_model_pio1)))
+
 
 # Calculate confidence intervals
 conf_intervals1 <- rbind(exp(confint(cox_model_pio1)))
@@ -113,83 +148,54 @@ p_values9 <- c(summary(cox_model_pio9)$coefficients["pioglitazone", "Pr(>|z|)"])
 
 # Cox proportional hazard ratio for Pioglitazone:
 
-all_hazard3 <- merge(hesin3, ALL_pioglitazone,  by.x="eid", all.x = TRUE)
+all_hazard3 <- merge(hesin3, ALL_ramipril,  by.x="eid", all.x = TRUE)
 all_hazard3 <- as.data.frame(all_hazard3[!duplicated(all_hazard3$eid), ])
 
 # Fit Cox proportional hazards model
 
-cox_model_ram1 <- coxph(Surv(epidiff, liverdisease) ~ pioglitazone, data = all_hazard3)
-cox_model_ram2 <- coxph(Surv(epidiff, alcoholicliver) ~ pioglitazone, data = all_hazard3)
-cox_model_ram3 <- coxph(Surv(epidiff, toxicliver) ~ pioglitazone, data = all_hazard3)
-cox_model_ram4 <- coxph(Surv(epidiff, Liverfailure) ~ pioglitazone, data = all_hazard3)
-cox_model_ram5 <- coxph(Surv(epidiff, ChronHepatitis) ~ pioglitazone, data = all_hazard3)
-cox_model_ram6 <- coxph(Surv(epidiff, fibrosecirrho) ~ pioglitazone, data = all_hazard3)
-cox_model_ram7 <- coxph(Surv(epidiff, inflammliver) ~ pioglitazone, data = all_hazard3)
-cox_model_ram8 <- coxph(Surv(epidiff, otherliverD) ~ pioglitazone, data = all_hazard3)
-cox_model_ram9 <- coxph(Surv(epidiff, UnclassLiverd) ~ pioglitazone, data = all_hazard3)
+cox_model_ram1 <- coxph(Surv(epidiff, liverdisease) ~ ramipril, data = all_hazard3)
+cox_model_ram2 <- coxph(Surv(epidiff, alcoholicliver) ~ ramipril, data = all_hazard3)
+cox_model_ram3 <- coxph(Surv(epidiff, toxicliver) ~ ramipril, data = all_hazard3)
+cox_model_ram4 <- coxph(Surv(epidiff, Liverfailure) ~ ramipril, data = all_hazard3)
+cox_model_ram5 <- coxph(Surv(epidiff, ChronHepatitis) ~ ramipril, data = all_hazard3)
+cox_model_ram6 <- coxph(Surv(epidiff, fibrosecirrho) ~ ramipril, data = all_hazard3)
+cox_model_ram7 <- coxph(Surv(epidiff, inflammliver) ~ ramipril, data = all_hazard3)
+cox_model_ram8 <- coxph(Surv(epidiff, otherliverD) ~ ramipril, data = all_hazard3)
+cox_model_ram9 <- coxph(Surv(epidiff, UnclassLiverd) ~ ramipril, data = all_hazard3)
 
 # Extract hazard ratio
 
-hazard_ratio1 <- c(exp(coef(cox_model_ram1)))
-hazard_ratio2 <- c(exp(coef(cox_model_ram2)))
-hazard_ratio3 <- c(exp(coef(cox_model_ram3)))
-hazard_ratio4 <- c(exp(coef(cox_model_ram4)))
-hazard_ratio5 <- c(exp(coef(cox_model_ram5)))
-hazard_ratio6 <- c(exp(coef(cox_model_ram6)))
-hazard_ratio7 <- c(exp(coef(cox_model_ram7))) 
-hazard_ratio8 <- c(exp(coef(cox_model_ram8)))
-hazard_ratio9 <- c(exp(coef(cox_model_ram9)))
+hazards_ratio1 <- c(exp(coef(cox_model_ram1)))
+hazards_ratio2 <- c(exp(coef(cox_model_ram2)))
+hazards_ratio3 <- c(exp(coef(cox_model_ram3)))
+hazards_ratio4 <- c(exp(coef(cox_model_ram4)))
+hazards_ratio5 <- c(exp(coef(cox_model_ram5)))
+hazards_ratio6 <- c(exp(coef(cox_model_ram6)))
+hazards_ratio7 <- c(exp(coef(cox_model_ram7))) 
+hazards_ratio8 <- c(exp(coef(cox_model_ram8)))
+hazards_ratio9 <- c(exp(coef(cox_model_ram9)))
 
 # Calculate confidence intervals
-conf_intervals1 <- rbind(exp(confint(cox_model_ram1)))
-conf_intervals2 <- rbind(exp(confint(cox_model_ram2)))
-conf_intervals3 <- rbind(exp(confint(cox_model_ram3)))
-conf_intervals4 <- rbind(exp(confint(cox_model_ram4)))
-conf_intervals5 <- rbind(exp(confint(cox_model_ram5)))
-conf_intervals6 <- rbind(exp(confint(cox_model_ram6)))
-conf_intervals7 <- rbind(exp(confint(cox_model_ram7)))
-conf_intervals8 <- rbind(exp(confint(cox_model_ram8)))
-conf_intervals9 <- rbind(exp(confint(cox_model_ram9)))
+confi_intervals1 <- rbind(exp(confint(cox_model_ram1)))
+confi_intervals2 <- rbind(exp(confint(cox_model_ram2)))
+confi_intervals3 <- rbind(exp(confint(cox_model_ram3)))
+confi_intervals4 <- rbind(exp(confint(cox_model_ram4)))
+confi_intervals5 <- rbind(exp(confint(cox_model_ram5)))
+confi_intervals6 <- rbind(exp(confint(cox_model_ram6)))
+confi_intervals7 <- rbind(exp(confint(cox_model_ram7)))
+confi_intervals8 <- rbind(exp(confint(cox_model_ram8)))
+confi_intervals9 <- rbind(exp(confint(cox_model_ram9)))
 
 # Extract p-values
-p_values1 <- c(summary(cox_model_ram1)$coefficients["pioglitazone", "Pr(>|z|)"])
-p_values2 <- c(summary(cox_model_ram2)$coefficients["pioglitazone", "Pr(>|z|)"])
-p_values3 <- c(summary(cox_model_ram3)$coefficients["pioglitazone", "Pr(>|z|)"]) 
-p_values4 <- c(summary(cox_model_ram4)$coefficients["pioglitazone", "Pr(>|z|)"])
-p_values5 <- c(summary(cox_model_ram5)$coefficients["pioglitazone", "Pr(>|z|)"]) 
-p_values6 <- c(summary(cox_model_ram6)$coefficients["pioglitazone", "Pr(>|z|)"])
-p_values7 <- c(summary(cox_model_ram7)$coefficients["pioglitazone", "Pr(>|z|)"])
-p_values8 <- c(summary(cox_model_ram8)$coefficients["pioglitazone", "Pr(>|z|)"])
-p_values9 <- c(summary(cox_model_ram9)$coefficients["pioglitazone", "Pr(>|z|)"])
-
-
-# Fit survival curve
-surv_obj <- survfit(Surv(epidiff, death) ~ 1, data = all_hazard3)
-
-# Plot survival curve with customized settings
-plot(surv_obj, xlab = "Years", ylab = "Survival Probability", main = "Survival Curve for Patients with Liver Disease",
-     col = "blue", # Change line color
-     lwd = 2,      # Increase line width
-     lty = 1)      # Change line type
-
-# Plot survival curves
-
-ggplot() + 
-  geom_step(data = data.frame(time = time_points1, surv = surv_prob1, group = "alcoholicliver"), aes(x = time, y = surv, group = group), color = "red", linewidth = 1) +
-  geom_step(data = data.frame(time = time_points2, surv = surv_prob2, group = "Toxicliver"), aes(x = time, y = surv, group = group), color = "blue", linewidth = 1) +
-  labs(x = "Time", y = "Survival Probability", title = "Survival Curves for Cox Models", color = "Group") +  
-  theme_minimal()   # Add more geom_step() for other survival curves...
-
-# Create forest plot
-
-forestplot( labeltext = labels, mean = hazard_ratios, lower = conf_intervals[, 1], upper = conf_intervals[, 2],
-            pvalues = p_values, txt_gp = fpTxtGp(label = gpar(fontsize = 12, col = "blue")),
-            col = fpColors(box = "black", lines = "red", text = "black"), xlab = "Hazard Ratio", graphwidth = unit(10, "cm"),
-            boxsize = 0.3, meanlines = TRUE, xticks = c(0.1, 0.5, 1, 2, 3), colgap = unit(1, "cm"), lwd.ci = 2, lwd.mean = 3, lwd.p = 2,
-            lwd.zero = 1, clip = c(0.1, 3), pval = 0.05, symbol = "circle", new_page = TRUE, vertices = TRUE,vertex.placement = c(0, 1)) 
-
-grid.lines(x = unit(seq(0, 1, length.out = length(labels)), "npc"), y = unit(0, "npc"), gp = gpar(col = "blue", lwd = 1, lty = "dotted"))
-
+P_valuesS1 <- c(summary(cox_model_ram1)$coefficients["ramipril", "Pr(>|z|)"])
+P_valuesS2 <- c(summary(cox_model_ram2)$coefficients["ramipril", "Pr(>|z|)"])
+P_valuesS3 <- c(summary(cox_model_ram3)$coefficients["ramipril", "Pr(>|z|)"]) 
+P_valuesS4 <- c(summary(cox_model_ram4)$coefficients["ramipril", "Pr(>|z|)"])
+P_valuesS5 <- c(summary(cox_model_ram5)$coefficients["ramipril", "Pr(>|z|)"]) 
+P_valuesS6 <- c(summary(cox_model_ram6)$coefficients["ramipril", "Pr(>|z|)"])
+P_valuesS7 <- c(summary(cox_model_ram7)$coefficients["ramipril", "Pr(>|z|)"])
+P_valuesS8 <- c(summary(cox_model_ram8)$coefficients["ramipril", "Pr(>|z|)"])
+P_valuesS9 <- c(summary(cox_model_ram9)$coefficients["ramipril", "Pr(>|z|)"])
 
 # Repeat for other models...
 
@@ -202,3 +208,69 @@ surv_prob1 <- summary_surv_fit1$surv # Create survival curves
 time_points1 <- summary_surv_fit1$time - time_shift
 surv_prob2 <- summary_surv_fit2$surv
 time_points2 <- summary_surv_fit2$time - time_shift
+
+# Plot survival curves
+
+ggplot() + 
+  geom_step(data = data.frame(time = time_points1, surv = surv_prob1, group = "alcoholicliver"), aes(x = time, y = surv, group = group), color = "red", linewidth = 1) +
+  geom_step(data = data.frame(time = time_points2, surv = surv_prob2, group = "Toxicliver"), aes(x = time, y = surv, group = group), color = "blue", linewidth = 1) +
+  labs(x = "Time(Years)", y = "Survival Probability", title = "Survival Curves for Cox Models", color = "Group") +  
+  theme_minimal()   # Add more geom_step() for other survival curves...
+
+# forest plot
+forestplot(labeltext = labels, 
+           mean = hazard_ratios, 
+           lower = conf_intervals[, 1], 
+           upper = conf_intervals[, 2],
+           pvalues = p_values, 
+           txt_gp = fpTxtGp(label = gpar(fontsize = 12, col = "blue")),
+           col = fpColors(box = "black", lines = "red", text = "black"), 
+           xlab = "Hazard Ratio", 
+           graphwidth = unit(10, "cm"),
+           boxsize = 0.3, 
+           meanlines = TRUE, 
+           xticks = c(0.1, 0.5, 1, 2, 3), 
+           colgap = unit(1, "cm"), 
+           lwd.ci = 2, 
+           lwd.mean = 3, 
+           lwd.p = 2,
+           lwd.zero = 1, 
+           clip = c(0.1, 3), 
+           pval = 0.05, 
+           symbol = "circle", 
+           new_page = TRUE, 
+           vertices = TRUE, 
+           vertex.placement = c(0, 1))
+
+average_mean <- mean(hazard_ratios)
+
+# Create a data frame for forest plot data
+forest_data <- data.frame(
+  label = labels,
+  mean = hazard_ratios,
+  lower = conf_intervals[, 1],
+  upper = conf_intervals[, 2],
+  pvalues = p_values
+)
+
+# Plot forest plot using ggplot2
+ggplot(forest_data, aes(x = mean, y = label)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = lower, xmax = upper)) +
+  geom_vline(xintercept = average_mean / 2, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 0, linetype = "solid", color = "black") +  # Line of null effect
+  labs(x = "Hazard Ratio") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())  # Remove grid lines
+# Draw a dashed red line at the calculated outcome effect ratio for each label
+
+# Kaplan Meier: 
+# Fit the Cox proportional hazards model:
+cox_model_sur <- coxph(Surv(epidiff, MASLD) ~ death, data = all_hazard)
+
+# Create Kaplan-Meier curve
+surv_object <- Surv(time = all_hazard$epidiff, event = all_hazard$MASLD)
+km_fit <- survfit(surv_object ~ death, data = all_hazard)
+
+# Plot the Kaplan-Meier curve with a legend
+ggsurvplot(km_fit, data = all_hazard, risk.table = TRUE, ggtheme = theme_minimal(), legend.labs = c("Survived", "death"))
