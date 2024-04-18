@@ -10,13 +10,11 @@ library(nloptr)
 # this columns are selected sub-Metabolites from Metabolites dataframe from Metabolites.R file. This file have dataframe names metabolites and df3. We took merged data of df3. 
 # Mentioned Metabolites have association with exogenous lipo-protein pathway in liver. 
 
-selected_columns <- metabolites %>%
-  select('LH', 'MH', 'LV', 'VSV', 'I', 'SL', 'TGH', 'TGL', 'TGV', 'TGI', 'VC', 'HC', 'LC', 'CI', 'CEV', 'CEL', 'CEH', 'CEI', 'TLEC', 'TLTG', 'TLCL', 'AB','A1','P')
+metabolites2 <- metabolites %>% select('LH', 'MH', 'LV', 'VSV', 'I', 'SL', 'TGH', 'TGL', 'TGV', 'TGI', 'VC', 'HC', 'LC', 'CI', 'CEV', 'CEL', 'CEH', 'CEI', 'TLEC', 'TLTG', 'TLCL', 'AB','A1','P')
 
 # the mean values for selected columns
 
-ODE_stats <- selected_columns %>%
-  summarise(across(.fns = mean))
+ODE_stats <- metabolites2 %>% summarise(across(.fns = mean))
 
 # Sub-metabolites calculations are depicted below. calculations of sub metabolites has been provided.
 
@@ -177,8 +175,7 @@ for (i in 1:num_guesses) {
   
   # Perform optimization
   result <- nloptr(x0 = parameters_guess3, eval_f = objective_wrapper2, opts = opts)
-  optim_results[[i]] <- result$solution
-}
+  optim_results[[i]] <- result$solution }
 
 # Create a dataframe for the solutions
 df_solution3 <- data.frame(matrix(unlist(optim_results), ncol = 7, byrow = TRUE))
@@ -186,6 +183,7 @@ colnames(df_solution3) <- c("k1", "k2", "k4", "k6", "k7", "k8", "k9")
 
 # Print the optimized parameters
 print(df_solution3)
+
 # Iterate over each set of parameters from df_solution and solve the ODE system
 solutions_list <- list()  # Initialize a list to store solutions for each set of parameters
 
@@ -206,3 +204,6 @@ for (i in 1:nrow(df_solution)) { # Get parameter values from df_solution
 for (i in 1:length(solutions_list)) {
   cat("Solution for parameters set", i, ":\n")
   print(solutions_list[[i]])}
+
+
+

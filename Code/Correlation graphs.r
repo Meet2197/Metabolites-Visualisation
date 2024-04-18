@@ -2,7 +2,7 @@
 # Dataset from NASH_df, MAFLD and healthy Patients dataframes merged with sub metabolites mentioned.  
 
 combined_data <- rbind(
-  mutate(Nash, Data_Frame = "NASH_df"),
+  mutate(Mash, Data_Frame = "MASH"),
   mutate(MAFLD, Data_Frame = "MAFLD"),
   mutate(Healthy_Patient, Data_Frame = "healthy_df"))
 

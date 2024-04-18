@@ -7,36 +7,28 @@ library(plotly)
 
 # File upload : 
 
-metabolite_metformin <-merge(matched1, metabolites, by.x="eid",by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
+metabolite_metformin <-merge(matched1, metabolites, by.x="eid" , by.y="eid", all.x = TRUE, all.y = TRUE ) %>%
   select('eid','TLC','TLHC','REC','VC','CLLC','LC','HC','TLTG','TGV','TGL','TGH','TLPL','PV','PL','PH','TLEC', 'CEV','CEL','CEH','TLFC','FCV','FCL','FCH', 'TLLPL','TLLPV','TLLPH','TLL','VLDL','LDL','CHDL','ADV ','ADL','ADH','P','TGPG','TLCL',
-         'PC','S','AB','A1','ABA1','TLFA','DU','O3FA','O6FA','PUFA','MUFA','SFA','LA','DHA','O3Tl','O6TL','PUTL','MUTL','STL','LATL','DCATL','PUMU','O63R','ALA','GLT','GLY','HIS','TLAA','ISO','LEU','VAL','PHA','TYR','GLS','LAC','PYR','CIT',
+         'PC','S','AB','A1','ABA1','TLFA','DU','O3FA','O6FA','PUFA','MUFA','SFA','LA','DHA','O3Tl','O6TL','PUTL','MUTL','STL','LATL','DCATL','PUMU','O63R','ALA','GLT','GLY','HIS','TLAA','ISO','LEU','VAL','PHA','TYR','LAC','PYR','CIT',
          'H3','ACT','ACTA','ATN','CTN','ALB','GPA','CMEL','LPEL','PCMEL','CCMEL','CECEL','FCMEL','TGEL',' VLV','TLVLV','PVLV','CVLV','CEVLV','FCVLV','TVLV','LV','TLPLV','PLV','CLV','CELV','FCLV','TGLV','MV','TLPMV','PMV','CMV','CEMV','FCMV',
          'TMV','SV','TLPSV','PSV','CSV','CESV','FCSV','TGSV','VSV','TLPVSV','PVSV','CVSV','CEVSV','FCVSV','TGVSV','I','TLPI','PI','CI','CEI','FCI','TGI','LL','TLPLL','PLL','CLL','CELL','FCLL','TGLL','ML','TLPML','PML','CML','CEML','FCML',
          'TGML','SL','TLPSL','PSL','CSL','CESL','FCSL','TGSL','VLH','TLPVLH','PVLH','CVLH','CEVLH','FCVLH','TGVLH','LH','TLPLH','PLH','CLH','CELH','FCLH','TGLH','MH','TLPMH','PMH','CMHD','metformin')
 
 summary_table <- function(x) { # library broom is required
-  
   num_vars <- ncol(x)
-  
   # Pre-define lists that will be populated and then collapsed by rest of function
   models <- vector("list", length = num_vars)
   first_tables <- vector("list", length = num_vars)
   second_tables <- vector("list", length = num_vars)
-  
   # Loop to create each row for the final table
   for (i in 1:num_vars) {
-    
     models[[i]] <- lm(x[[i]] ~ metformin, data = metabolite_metformin)
     first_tables[[i]] <- broom::tidy(models[[i]])}  
-  
   # Combine the rows together into a final table
   final_table <- do.call("rbind", first_tables)
-  
   return(final_table)}
-
 #add here all columns you want to include 
-final_table1 <- summary_table(metabolite_metformin[2:170])
-
+final_table1 <- summary_table(metabolite_metformin[2:169])
 final_table_Metformin <- subset(final_table1, term=="metformin")
 
 # P value generation of metformin associated metabolites against log10. 
@@ -45,7 +37,7 @@ final_table_Metformin <- final_table_Metformin[-c(1,2,3,4,5)]
 
 # generate smd value. 
 
-smd_values <- apply(metabolite_metformin[, 2:170], 2, function(x) {
+smd_values <- apply(metabolite_metformin[, 2:169], 2, function(x) {
   group_means <- aggregate(x, list(metabolite_metformin$metformin), mean, na.rm = TRUE)
   group_sds <- aggregate(x, list(metabolite_metformin$metformin), sd, na.rm = TRUE)
   
@@ -86,10 +78,23 @@ all_Metformin<-cbind(table_smd, final_table_Metformin)
 # name change for smd 
 colnames(all_Metformin)[colnames(all_Metformin) == "4"] <- "smd"
 
+smd <- all_Metformin$smd
+logp <- all_Metformin$logp
+
+# Create a hexbin plot
+
+ggplot(all_Metformin, aes(x = smd, y = logp)) +
+  geom_hex(bins = 40) + scale_fill_viridis_c() + # Optional: better color scale
+  labs(title = "Hexbin Plot of metformin consuming patients", x = "SMD", y = "-log10(p-value)") + theme_minimal() +
+  annotate("text", x = all_Metformin$smd, y = all_Metformin$logp, label = rownames(all_Metformin),color = "green", size = 2,
+  hjust = 0.5, vjust = 0.5)
+
 # Define significance threshold for p-value
+
 threshold <- 0.5
 
 # Volacno plot generation with ggplot with log 10 p value 
+
 all_Metformin <- subset(all_Metformin, logp >= 0 & logp <= 100 & smd >= -0.25 & smd <= 0.75)
 
 # plot generation for for Metformin (this plot require ggrepl abd ggplot)

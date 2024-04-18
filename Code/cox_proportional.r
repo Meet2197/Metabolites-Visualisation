@@ -5,7 +5,7 @@ library(survminer)
 library(grid)
 
 # Create labels for forest plot
-labels <- c("liverdisease","alcoholicliver","toxicliver","Liverfailure","ChronHepatitis","fibrosecirrho","inflammliver","otherliverD","UnclassLiverd","MASH","MASLD")
+labels <- c("liverdisease","alcoholicliver","toxicliver","Liverfailure","ChronHepatitis","fibrosecirrho","inflammliver","otherliverD","UnclassLiverd")
 
 # NAs to replace :
 
@@ -45,7 +45,7 @@ cox_model7 <- coxph(Surv(epidiff, inflammliver) ~ metformin, data = all_hazard)
 cox_model8 <- coxph(Surv(epidiff, otherliverD) ~ metformin, data = all_hazard)
 cox_model9 <- coxph(Surv(epidiff, UnclassLiverd) ~ metformin, data = all_hazard)
 cox_model10 <- coxph(Surv(epidiff, MASLD) ~ metformin, data = all_hazard)
-cox_model11 <- coxph(Surv(epidiff, MASH) ~ metformin, data = all_hazard)
+cox_model11 <- coxph(Surv(epidiff, MRI) ~ metformin, data = all_hazard)
 
 # Extract hazard ratio
 
@@ -106,21 +106,22 @@ cox_model_pio7 <- coxph(Surv(epidiff, inflammliver) ~ pioglitazone, data = all_h
 cox_model_pio8 <- coxph(Surv(epidiff, otherliverD) ~ pioglitazone, data = all_hazard2)
 cox_model_pio9 <- coxph(Surv(epidiff, UnclassLiverd) ~ pioglitazone, data = all_hazard2)
 cox_model_pio10 <- coxph(Surv(epidiff, MASLD) ~ pioglitazone, data = all_hazard2)
-cox_model_pio11 <- coxph(Surv(epidiff, MASH) ~ pioglitazone, data = all_hazard2)
+cox_model_pio11 <- coxph(Surv(epidiff, MRI) ~ pioglitazone, data = all_hazard2)
+
 
 # Extract hazard ratio
 
-hazard_ratio1 <- c(exp(coef(cox_model_pio1)))
-hazard_ratio2 <- c(exp(coef(cox_model_pio2)))
-hazard_ratio3 <- c(exp(coef(cox_model_pio3)))
-hazard_ratio4 <- c(exp(coef(cox_model_pio4)))
-hazard_ratio5 <- c(exp(coef(cox_model_pio5)))
-hazard_ratio6 <- c(exp(coef(cox_model_pio6)))
-hazard_ratio7 <- c(exp(coef(cox_model_pio7))) 
-hazard_ratio8 <- c(exp(coef(cox_model_pio8)))
-hazard_ratio9 <- c(exp(coef(cox_model_pio9)))
-hazard_ratio10 <- c(exp(coef(cox_model_pio10)))
-hazard_ratio11 <- c(exp(coef(cox_model_pio1)))
+hazards_ratio1 <- c(exp(coef(cox_model_pio1)))
+hazards_ratio2 <- c(exp(coef(cox_model_pio2)))
+hazards_ratio3 <- c(exp(coef(cox_model_pio3)))
+hazards_ratio4 <- c(exp(coef(cox_model_pio4)))
+hazards_ratio5 <- c(exp(coef(cox_model_pio5)))
+hazards_ratio6 <- c(exp(coef(cox_model_pio6)))
+hazards_ratio7 <- c(exp(coef(cox_model_pio7))) 
+hazards_ratio8 <- c(exp(coef(cox_model_pio8)))
+hazards_ratio9 <- c(exp(coef(cox_model_pio9)))
+hazards_ratio10 <- c(exp(coef(cox_model_pio10)))
+hazards_ratio11 <- c(exp(coef(cox_model_pio11)))
 
 
 # Calculate confidence intervals
@@ -133,6 +134,8 @@ conf_intervals6 <- rbind(exp(confint(cox_model_pio6)))
 conf_intervals7 <- rbind(exp(confint(cox_model_pio7)))
 conf_intervals8 <- rbind(exp(confint(cox_model_pio8)))
 conf_intervals9 <- rbind(exp(confint(cox_model_pio9)))
+conf_intervals10 <- rbind(exp(confint(cox_model_pio10)))
+conf_intervals11 <- rbind(exp(confint(cox_model_pio11)))
 
 # Extract p-values
 p_values1 <- c(summary(cox_model_pio1)$coefficients["pioglitazone", "Pr(>|z|)"])
@@ -144,7 +147,8 @@ p_values6 <- c(summary(cox_model_pio6)$coefficients["pioglitazone", "Pr(>|z|)"])
 p_values7 <- c(summary(cox_model_pio7)$coefficients["pioglitazone", "Pr(>|z|)"])
 p_values8 <- c(summary(cox_model_pio8)$coefficients["pioglitazone", "Pr(>|z|)"])
 p_values9 <- c(summary(cox_model_pio9)$coefficients["pioglitazone", "Pr(>|z|)"])
-
+p_values10 <- c(summary(cox_model_pio10)$coefficients["pioglitazone", "Pr(>|z|)"])
+p_values11 <- c(summary(cox_model_pio11)$coefficients["pioglitazone", "Pr(>|z|)"])
 
 # Cox proportional hazard ratio for Pioglitazone:
 
@@ -218,58 +222,57 @@ ggplot() +
   theme_minimal()   # Add more geom_step() for other survival curves...
 
 # forest plot
-forestplot(labeltext = labels, 
-           mean = hazard_ratios, 
-           lower = conf_intervals[, 1], 
-           upper = conf_intervals[, 2],
-           pvalues = p_values, 
-           txt_gp = fpTxtGp(label = gpar(fontsize = 12, col = "blue")),
-           col = fpColors(box = "black", lines = "red", text = "black"), 
-           xlab = "Hazard Ratio", 
-           graphwidth = unit(10, "cm"),
-           boxsize = 0.3, 
-           meanlines = TRUE, 
-           xticks = c(0.1, 0.5, 1, 2, 3), 
-           colgap = unit(1, "cm"), 
-           lwd.ci = 2, 
-           lwd.mean = 3, 
-           lwd.p = 2,
-           lwd.zero = 1, 
-           clip = c(0.1, 3), 
-           pval = 0.05, 
-           symbol = "circle", 
-           new_page = TRUE, 
-           vertices = TRUE, 
-           vertex.placement = c(0, 1))
-
 average_mean <- mean(hazard_ratios)
+forest_data <- forest_data %>%
+  mutate(mean_limited = ifelse(mean > 3, 3, mean),
+         upper_limited = ifelse(mean > 3, 3, upper),
+         arrow_label = ifelse(mean > 3, " > 3", ""))  # Add arrow label for hazard ratios > 3
 
-# Create a data frame for forest plot data
-forest_data <- data.frame(
-  label = labels,
-  mean = hazard_ratios,
-  lower = conf_intervals[, 1],
-  upper = conf_intervals[, 2],
-  pvalues = p_values
-)
+# Plot forest plot using ggplot2 with modifications
+arrow_data <- forest_data %>%
+  filter(upper > 3)
 
-# Plot forest plot using ggplot2
-ggplot(forest_data, aes(x = mean, y = label)) +
+# Plot forest plot using ggplot2 with modifications
+ggplot(forest_data, aes(x = mean_limited, y = label)) +
   geom_point() +
-  geom_errorbarh(aes(xmin = lower, xmax = upper)) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), color = "red") +  # Add red color to confidence interval lines
   geom_vline(xintercept = average_mean / 2, linetype = "dashed", color = "red") +
   geom_hline(yintercept = 0, linetype = "solid", color = "black") +  # Line of null effect
-  labs(x = "Hazard Ratio") +
+  geom_text(aes(label = arrow_label), hjust = -0.5, color = "red", size = 5, check_overlap = TRUE, fontface = "bold") +  # Add arrow label with red bold font
+  geom_segment(data = arrow_data, aes(x = upper_limited + 0.1, xend = upper_limited + 0.5, y = label, yend = label),
+               arrow = arrow(length = unit(0.3, "cm"), type = "closed"), color = "black", size = 0.5) +  # Add arrow segments
+  labs(x = "Hazard Ratio", title = "Forest Plot of Hazard Ratio for metformin consumption") +  # Add title
   theme_minimal() +
-  theme(panel.grid = element_blank())  # Remove grid lines
-# Draw a dashed red line at the calculated outcome effect ratio for each label
+  theme(panel.grid = element_blank())   # Remove grid lines
+
+# Combine hazard ratios, confidence intervals, and p-values into a data frame
+forest_data2 <- data.frame(
+  treatment = c("liverdisease","alcoholicliver","toxicliver","Liverfailure","ChronHepatitis","fibrosecirrho","inflammliver","otherliverD","UnclassLiverd","MASLD","MRI"),
+  mean = c(hazards_ratio1, hazards_ratio2, hazards_ratio3, hazards_ratio4, hazards_ratio5, hazards_ratio6, hazards_ratio7, hazards_ratio8, hazards_ratio9, hazards_ratio10, hazards_ratio11),
+  lower = c(conf_intervals1[1], conf_intervals2[1], conf_intervals3[1], conf_intervals4[1], conf_intervals5[1], conf_intervals6[1], conf_intervals7[1], conf_intervals8[1], conf_intervals9[1], conf_intervals10[1], conf_intervals11[1]),
+  upper = c(conf_intervals1[2], conf_intervals2[2], conf_intervals3[2], conf_intervals4[2], conf_intervals5[2], conf_intervals6[2], conf_intervals7[2], conf_intervals8[2], conf_intervals9[2], conf_intervals10[2],conf_intervals11[2]),
+  p_value = c(p_values1, p_values2, p_values3, p_values4, p_values5, p_values6, p_values7, p_values8, p_values9, p_values10, p_values11))
+
+# Calculate average mean for reference
+average_mean2 <- mean(forest_data2$mean)
+
+# Plot forest plot using ggplot2 with modifications
+ggplot(forest_data2, aes(x = mean, y = treatment)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), color = "red") +  # Add red color to confidence interval lines
+  geom_vline(xintercept = average_mean2 / 2, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 0, linetype = "solid", color = "black") +  # Line of null effect
+  geom_text(aes(label = ifelse(p_value < 0.05, "*", "")), hjust = -0.5, color = "black", size = 3.5, check_overlap = TRUE) +  # Add asterisk for significant p-values
+  labs(x = "Hazard Ratio", y = "Treatment", title = "Forest Plot of Pioglitazone Hazard Ratio") +  # Add title and axis labels
+  theme_minimal() +
+  theme(panel.grid = element_blank())
 
 # Kaplan Meier: 
 # Fit the Cox proportional hazards model:
-cox_model_sur <- coxph(Surv(epidiff, MASLD) ~ death, data = all_hazard)
+cox_model_sur <- coxph(Surv(epidiff, liverdisease) ~ death, data = all_hazard)
 
 # Create Kaplan-Meier curve
-surv_object <- Surv(time = all_hazard$epidiff, event = all_hazard$MASLD)
+surv_object <- Surv(time = all_hazard$epidiff, event = all_hazard$liverdisease)
 km_fit <- survfit(surv_object ~ death, data = all_hazard)
 
 # Plot the Kaplan-Meier curve with a legend

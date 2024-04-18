@@ -84,7 +84,7 @@ covariates <- na.omit (covariates)
 mri <- na.omit(mri)
 diabetes <- na.omit(diabetes)
 
-# Sellectign columns form admissionP dataframe. 
+# Selection columns form admissionP dataframe. 
 
 admissionP <- na.omit(hesin) %>% select("eid","admidate")
 
@@ -128,17 +128,23 @@ MAFLD_df <- diagnosed_metformin_df[diagnosed_metformin_df$icd_group == 'K76.0', 
 # MRI data:
 
 mri <- mri %>% mutate(low_fat = ifelse(Liver_fat < 5, Liver_fat, NA), high_fat = ifelse(Liver_fat > 5, Liver_fat, NA))
+mri <- mri %>% mutate (high_fat = ifelse(Liver_fat > 5, Liver_fat, NA)) 
+
 
 # If you want to replace NA with 0, you can use na_if() function
-mri <- mri %>% mutate(low_fat = na_if(low_fat, NA), high_fat = na_if(high_fat, NA))
+mri <- mri %>% mutate(high_fat = na_if(high_fat, NA))
 mri <- mri %>% select(-Liver_fat) # If you want to remove the original "fat" column, you can use select() function
+mri <- mri %>% filter(!is.na(high_fat)) %>% select(eid, high_fat)
+mri$MRI <- 1 
+
+# mri <- mri %>% filter(!is.na(high_fat) | !is.na(low_fat))
 
 ## 1.5 Death cause and death dataframe intersect to observe cause of NAFLD and MAFLD. 
 
 common6 <- intersect(death$eid_1 , death_cause$eid)
 death_common = death[common6, ]
 death_cause_common = death_cause[common6,]
-death_df = merge(death, death_cause, by.x=c('eid','ins_index'), by.y=c('eid','ins_index'))
+death_df = merge(death, death_cause, by.x=c('eid_1','ins_index'), by.y=c('eid','ins_index'))
 
 NASH_death <- death_df[death_df$cause_icd10 == "K758", ]
 MASLD_death <- death_df[death_df$cause_icd10 == "K760", ]

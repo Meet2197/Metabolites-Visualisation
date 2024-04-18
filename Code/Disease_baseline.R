@@ -60,6 +60,7 @@ MASH <- select(MASH, c(eid, Diagnosis))
 # liver related Mortality
 
 mortality_df <- death_df[death_df$icd_group %in% c('K70.0', 'K71.0', 'K72.0', 'K73.0', 'K74.0', 'K75.0', 'K76.0', 'K77.0'), ]
+setnames(mortality_df,"eid_1","eid")
 
 # Toxic liver:
 
@@ -143,7 +144,7 @@ ALL <-merge(ALL, liverdisease, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_
 ALL <-merge(ALL, mortality_df, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
             'Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death')
 ALL <-merge(ALL, mri, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
-            'Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death','low_fat','high_fat')
+            'Diabetes','metformin', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death','MRI','high_fat')
 
 
 # pioglitazone merge with MASLD and MASH :
@@ -158,7 +159,7 @@ ALL_pioglitazone <-merge(ALL_pioglitazone, liverdisease, by.x="eid", all.x = TRU
 ALL_pioglitazone <-merge(ALL_pioglitazone, mortality_df, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
          'Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death')
 ALL_pioglitazone <-merge(ALL_pioglitazone, mri, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
-         'Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death','low_fat','high_fat')
+         'Diabetes','pioglitazone', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death','MRI','high_fat')
 
 # Ramipril merge with ALL database :
 
@@ -175,7 +176,7 @@ ALL_ramipril <-merge(ALL_ramipril, liverdisease, by.x="eid", all.x = TRUE) %>% s
 ALL_ramipril <-merge(ALL_ramipril, mortality_df, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
       'Diabetes','ramipril','hypertension', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death')
 ALL_ramipril <-merge(ALL_ramipril, mri, by.x="eid", all.x = TRUE) %>% select('eid', 'Age_AC', 'Gender','BMI','Smoking', 'Drinking', 'Qualifications',
-      'Diabetes','ramipril','hypertension', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death','low_fat','high_fat')
+      'Diabetes','ramipril','hypertension', 'MASLD','MASH','alcoholicliver','toxicliver','Liverfailure','ChronHepatitis','fibrosecirrho','inflammliver','otherliverD','UnclassLiverd','ALT','GLS','AST','GGT','liverdisease','death','high_fat')
 
 
 # death df from MASLD and MASH death of patients : 
@@ -264,11 +265,21 @@ BMI_ttest_Pioglitazone <- t.test(ALL_pioglitazone$pioglitazone , ALL_pioglitazon
 matched31 <- matched3[matched3$ramipril == 1, ]
 matched32 <- matched3[matched3$ramipril == 0, ]
 
+# Data imputation for Age:
+
+matched31$Age_AC[matched31$Age_AC == 0] <- NA
+matched32$Age_AC[matched32$Age_AC == 0] <- NA
+
 # Calculate mean and standard deviation of age :
-ramipril_age1 <- mean(matched31$Age_AC)
-ramipril_age2 <- sd(matched31$Age_AC)
-ramipril_age3 <- mean(matched32$Age_AC)
-ramipril_age4 <- sd(matched32$Age_AC)
+ramipril_age1 <- mean(matched31$Age_AC, na.rm = TRUE)
+ramipril_age2 <- sd(matched31$Age_AC, na.rm = TRUE)
+ramipril_age3 <- mean(matched32$Age_AC, na.rm = TRUE)
+ramipril_age4 <- sd(matched32$Age_AC, na.rm = TRUE)
+
+# Data imputation for BMI:
+
+matched31$BMI[matched31$BMI == 0] <- NA
+matched32$BMI[matched32$BMI == 0] <- NA
 
 # Calculate mean and standard deviation of BMI : 
 ramipril_BMI1 <- mean(matched31$BMI,na.rm = TRUE)
@@ -276,11 +287,21 @@ ramipril_BMI2 <- sd(matched31$BMI,na.rm = TRUE)
 ramipril_BMI3 <- mean(matched32$BMI,na.rm = TRUE)
 ramipril_BMI4 <- sd(matched32$BMI,na.rm = TRUE)
 
+# Data imputation for ALT:
+
+matched31$ALT[matched31$ALT == 0] <- NA
+matched32$ALT[matched32$ALT == 0] <- NA
+
 # Calculate mean and standard deviation of ALT : 
 ramipril_ALT1 <- mean(matched31$ALT,na.rm = TRUE)
 ramipril_ALT2 <- sd(matched31$ALT,na.rm = TRUE)
 ramipril_ALT3 <- mean(matched32$ALT,na.rm = TRUE)
 ramipril_ALT4 <- sd(matched32$ALT,na.rm = TRUE)
+
+# Data imputation for GLS:
+
+matched31$GLS[matched31$GLS == 0] <- NA
+matched32$GLS[matched32$GLS == 0] <- NA
 
 # Calculate mean and standard deviation of GLS : 
 ramipril_GLS1 <- mean(matched31$GLS,na.rm = TRUE)
@@ -288,11 +309,21 @@ ramipril_GLS2 <- sd(matched31$GLS,na.rm = TRUE)
 ramipril_GLS3 <- mean(matched32$GLS,na.rm = TRUE)
 ramipril_GLS4 <- sd(matched32$GLS,na.rm = TRUE)
 
+# Data imputation for AST:
+
+matched31$AST[matched31$AST == 0] <- NA
+matched32$AST[matched32$AST == 0] <- NA
+
 # Calculate mean and standard deviation of AST : 
 ramipril_AST1 <- mean(matched31$AST,na.rm = TRUE)
 ramipril_AST2 <- sd(matched31$AST,na.rm = TRUE)
 ramipril_AST3 <- mean(matched32$AST,na.rm = TRUE)
 ramipril_AST4 <- sd(matched32$AST,na.rm = TRUE)
+
+# Data imputation for GGT:
+
+matched31$GGT[matched31$GGT == 0] <- NA
+matched32$GGT[matched32$GGT == 0] <- NA
 
 # Calculate mean and standard deviation of GGT : 
 ramipril_GGT1 <- mean(matched31$GGT,na.rm = TRUE)
@@ -305,6 +336,11 @@ ramipril_LFAT1 <- mean(matched31$low_fat,na.rm = TRUE)
 ramipril_LFAT2 <- sd(matched31$low_fat,na.rm = TRUE)
 ramipril_LFAT3 <- mean(matched32$low_fat,na.rm = TRUE)
 ramipril_LFAT4 <- sd(matched32$low_fat,na.rm = TRUE)
+
+# Data imputation for high_fat:
+
+matched31$high_fat[matched31$high_fat == 0] <- NA
+matched32$high_fat[matched32$high_fat == 0] <- NA
 
 # Calculate mean and standard deviation of MFAT : 
 ramipril_MFAT1 <- mean(matched31$high_fat,na.rm = TRUE)
@@ -439,17 +475,34 @@ ramipril_t_test_ALT <- t.test(matched3$ramipril , matched3$GLS, na.rm = TRUE)
 matched21 <- matched2[matched2$pioglitazone == 1, ]
 matched22 <- matched2[matched2$pioglitazone == 0, ]
 
+# Age at pioglitazone matched medication: 
+
+matched21$Age_AC[matched21$Age_AC == 0] <- NA
+matched22$Age_AC[matched22$Age_AC == 0] <- NA
+
 # Calculate mean and standard deviation of age :
-pioglitazone_age1 <- mean(matched21$Age_AC)
-pioglitazone_age2 <- sd(matched21$Age_AC)
-pioglitazone_age3 <- mean(matched22$Age_AC)
-pioglitazone_age4 <- sd(matched22$Age_AC)
+
+pioglitazone_age1 <- mean(matched21$Age_AC,na.rm = TRUE)
+pioglitazone_age2 <- sd(matched21$Age_AC,na.rm = TRUE)
+pioglitazone_age3 <- mean(matched22$Age_AC,na.rm = TRUE)
+pioglitazone_age4 <- sd(matched22$Age_AC,na.rm = TRUE)
+
+# BMI at pioglitazone matched medication: 
+
+matched21$BMI[matched21$BMI == 0] <- NA
+matched22$BMI[matched22$BMI == 0] <- NA
 
 # Calculate mean and standard deviation of BMI : 
+
 pioglitazone_BMI1 <- mean(matched21$BMI,na.rm = TRUE)
 pioglitazone_BMI2 <- sd(matched21$BMI,na.rm = TRUE)
 pioglitazone_BMI3 <- mean(matched22$BMI,na.rm = TRUE)
 pioglitazone_BMI4 <- sd(matched22$BMI,na.rm = TRUE)
+
+# ALT at pioglitazone matched medication: 
+
+matched21$ALT[matched21$ALT == 0] <- NA
+matched22$ALT[matched22$ALT == 0] <- NA
 
 # ALT 
 pioglitazone_ALT1 <- mean(matched21$ALT,na.rm = TRUE)
@@ -457,17 +510,33 @@ pioglitazone_ALT2 <- sd(matched21$ALT,na.rm = TRUE)
 pioglitazone_ALT3 <- mean(matched22$ALT,na.rm = TRUE)
 pioglitazone_ALT4 <- sd(matched22$ALT,na.rm = TRUE)
 
+# AST at pioglitazone matched medication: 
+
+matched21$AST[matched21$AST == 0] <- NA
+matched22$AST[matched22$AST == 0] <- NA
+
+
 # AST:
 pioglitazone_AST1 <- mean(matched21$AST,na.rm = TRUE)
 pioglitazone_AST2 <- sd(matched21$AST,na.rm = TRUE)
 pioglitazone_AST3 <- mean(matched22$AST,na.rm = TRUE)
 pioglitazone_AST4 <- sd(matched22$AST,na.rm = TRUE)
 
+# GGT at pioglitazone matched medication: 
+
+matched21$GGT[matched21$GGT == 0] <- NA
+matched22$GGT[matched22$GGT == 0] <- NA
+
 # GGT 
 pioglitazone_GGT1 <- mean(matched21$GGT,na.rm = TRUE)
 pioglitazone_GGT2 <- sd(matched21$GGT,na.rm = TRUE)
 pioglitazone_GGT3 <- mean(matched22$GGT,na.rm = TRUE)
 pioglitazone_GGT4 <- sd(matched22$GGT,na.rm = TRUE)
+
+# GLS at pioglitazone matched medication: 
+
+matched21$GLS[matched21$GLS == 0] <- NA
+matched22$GLS[matched22$GLS == 0] <- NA
 
 # Glucose:
 pioglitazone_GLS1 <- mean(matched21$GLS,na.rm = TRUE)
@@ -499,23 +568,17 @@ pioglitazone_smd_AST <- (pioglitazone_AST1 - pioglitazone_AST3) / pioglitazone_s
 pioglitazone_sd_GGT <- sqrt((pioglitazone_GGT2^2 + pioglitazone_GGT4^2) / 2)
 pioglitazone_smd_GGT <- (pioglitazone_GGT1 - pioglitazone_GGT3) / pioglitazone_sd_GGT #Standardized mean difference for age
 
-# liver fat matched mean and SD for metformin and nonmetformin :
+# High fat
 
-pioglitazone_mean_LFAT <- mean(matched21$low_fat)
-pioglitazone_sd_LFAT <- sd(matched21$low_fat)
-nonpioglitazone_mean_LFAT <- mean(matched22$low_fat)
-nonpioglitazone_sd_LFAT <- sd(matched22$low_fat)
-
-# Calculate pooled standard deviation for Low fat
-pioglitazone_sd_LFAT <- sqrt((pioglitazone_sd_LFAT^2 + nonpioglitazone_sd_LFAT^2) / 2)
-pioglitazone_smd_LFAT <- (pioglitazone_mean_LFAT - nonpioglitazone_mean_LFAT) / pioglitazone_sd_LFAT
+matched21$high_fat[matched21$high_fat == 0] <- NA
+matched22$high_fat[matched22$high_fat == 0] <- NA
 
 # liver Low fat matched mean and SD for metformin and nonmetformin :
 
-pioglitazone_mean_MFAT <- mean(matched21$high_fat)
-pioglitazone_sd_MFAT <- sd(matched21$high_fat)
-nonpioglitazone_mean_MFAT <- mean(matched22$high_fat)
-nonpioglitazone_sd_MFAT <- sd(matched22$high_fat)
+pioglitazone_mean_MFAT <- mean(matched21$high_fat,na.rm = TRUE)
+pioglitazone_sd_MFAT <- sd(matched21$high_fat,na.rm = TRUE)
+nonpioglitazone_mean_MFAT <- mean(matched22$high_fat,na.rm = TRUE)
+nonpioglitazone_sd_MFAT <- sd(matched22$high_fat,na.rm = TRUE)
 
 # Calculate pooled standard deviation for Low fat
 pioglitazone_sd_MFAT <- sqrt((pioglitazone_sd_MFAT^2 + nonpioglitazone_sd_MFAT^2) / 2)
@@ -623,57 +686,77 @@ pioglitazone_t_test_Gender <- t.test(matched2$pioglitazone , matched2$Gender, na
 #calculating Mean and SD of Metformin with Age of baseline :
 
 # Calculate mean and standard deviation of BMI
-matched1_metformin <- subset(matched5, metformin == 1)
-matched1_nonmetformin <- subset(matched5, metformin == 0)
+matched1_metformin <- subset(matched1, metformin == 1)
+matched1_nonmetformin <- subset(matched1, metformin == 0)
+
+# Filter out 0 values from the AST column
+matched1_metformin$BMI[matched1_metformin$BMI == 0] <- NA
+matched1_nonmetformin$BMI[matched1_nonmetformin$BMI == 0] <- NA
 
 # BMI matched mean and SD for metformin and nonmetformin :
-metformin_mean_bmi <- mean(matched1_metformin$BMI)
-metformin_sd_bmi <- sd(matched1_metformin$BMI)
-nonmetformin_mean_bmi <- mean(matched1_nonmetformin$BMI)
-nonmetformin_sd_bmi <- sd(matched1_nonmetformin$BMI)
+metformin_mean_bmi <- mean(matched1_metformin$BMI, na.rm = TRUE)
+metformin_sd_bmi <- sd(matched1_metformin$BMI, na.rm = TRUE)
+nonmetformin_mean_bmi <- mean(matched1_nonmetformin$BMI, na.rm = TRUE)
+nonmetformin_sd_bmi <- sd(matched1_nonmetformin$BMI, na.rm = TRUE)
 
 
 # Calculate pooled standard deviation
 metformin_sd_bmi <- sqrt((metformin_sd_bmi^2 + nonmetformin_sd_bmi^2) / 2)
 smd_bmi <- (metformin_mean_bmi - nonmetformin_mean_bmi) / metformin_sd_bmi
 
+# Filter out 0 values from the GLS column
+matched1_metformin$GLS[matched1_metformin$GLS == 0] <- NA
+matched1_nonmetformin$GLS[matched1_nonmetformin$GLS == 0] <- NA
+
 # Glucose matched mean and SD for metformin and nonmetformin :
-metformin_mean_GLS <- mean(matched1_metformin$GLS)
-metformin_sd_GLS <- sd(matched1_metformin$GLS)
-nonmetformin_mean_GLS <- mean(matched1_nonmetformin$GLS)
-nonmetformin_sd_GLS <- sd(matched1_nonmetformin$GLS)
+metformin_mean_GLS <- mean(matched1_metformin$GLS, na.rm = TRUE)
+metformin_sd_GLS <- sd(matched1_metformin$GLS, na.rm = TRUE)
+nonmetformin_mean_GLS <- mean(matched1_nonmetformin$GLS, na.rm = TRUE)
+nonmetformin_sd_GLS <- sd(matched1_nonmetformin$GLS, na.rm = TRUE)
 
 # Glucose standard deviation
 metformin_sd_GLS <- sqrt((metformin_sd_GLS^2 + nonmetformin_sd_GLS^2) / 2)
 smd_GLS <- (metformin_mean_GLS - nonmetformin_mean_GLS) / metformin_sd_GLS
 
+# Filter out 0 values from the ALT column
+matched1_metformin$ALT[matched1_metformin$ALT == 0] <- NA
+matched1_nonmetformin$ALT[matched1_nonmetformin$ALT == 0] <- NA
+
 # ALT matched mean and SD for metformin and nonmetformin :
-metformin_mean_ALT <- mean(matched1_metformin$ALT)
-metformin_sd_ALT <- sd(matched1_metformin$ALT)
-nonmetformin_mean_ALT <- mean(matched1_nonmetformin$ALT)
-nonmetformin_sd_ALT <- sd(matched1_nonmetformin$ALT)
+metformin_mean_ALT <- mean(matched1_metformin$ALT, na.rm = TRUE)
+metformin_sd_ALT <- sd(matched1_metformin$ALT, na.rm = TRUE)
+nonmetformin_mean_ALT <- mean(matched1_nonmetformin$ALT, na.rm = TRUE)
+nonmetformin_sd_ALT <- sd(matched1_nonmetformin$ALT, na.rm = TRUE)
 
 # Calculate pooled standard deviation ALT:
 
 metformin_sd_ALT <- sqrt((metformin_sd_ALT^2 + nonmetformin_sd_ALT^2) / 2)
 smd_ALT <- (metformin_mean_ALT - nonmetformin_mean_ALT) / metformin_sd_ALT
 
+# Filter out 0 values from the GGT column
+matched1_metformin$GGT[matched1_metformin$GGT == 0] <- NA
+matched1_nonmetformin$GGT[matched1_nonmetformin$GGT == 0] <- NA
+
 # GGT matched mean and SD for metformin and nonmetformin :
-metformin_mean_GGT <- mean(matched1_metformin$GGT)
-metformin_sd_GGT <- sd(matched1_metformin$GGT)
-nonmetformin_mean_GGT <- mean(matched1_nonmetformin$GGT)
-nonmetformin_sd_GGT <- sd(matched1_nonmetformin$GGT)
+metformin_mean_GGT <- mean(matched1_metformin$GGT, na.rm = TRUE)
+metformin_sd_GGT <- sd(matched1_metformin$GGT, na.rm = TRUE)
+nonmetformin_mean_GGT <- mean(matched1_nonmetformin$GGT, na.rm = TRUE)
+nonmetformin_sd_GGT <- sd(matched1_nonmetformin$GGT, na.rm = TRUE)
 
 # Calculate pooled standard deviation GGT :
 metformin_sd_GGT <- sqrt((metformin_sd_GGT^2 + nonmetformin_sd_GGT^2) / 2)
 smd_GGT <- (metformin_mean_GGT - nonmetformin_mean_GGT) / metformin_sd_GGT
 
+# Filter out 0 values from the AST column
+matched1_metformin$AST[matched1_metformin$AST == 0] <- NA
+matched1_nonmetformin$AST[matched1_nonmetformin$AST == 0] <- NA
+
 # AST matched mean and SD for metformin and nonmetformin :
 
-metformin_mean_AST <- mean(matched1_metformin$AST)
-metformin_sd_AST <- sd(matched1_metformin$AST)
-nonmetformin_mean_AST <- mean(matched1_nonmetformin$AST)
-nonmetformin_sd_AST <- sd(matched1_nonmetformin$AST)
+metformin_mean_AST <- mean(matched1_metformin$AST, na.rm = TRUE)
+metformin_sd_AST <- sd(matched1_metformin$AST, na.rm = TRUE)
+nonmetformin_mean_AST <- mean(matched1_nonmetformin$AST, na.rm = TRUE)
+nonmetformin_sd_AST <- sd(matched1_nonmetformin$AST, na.rm = TRUE)
 
 # Calculate pooled standard deviation
 metformin_sd_AST <- sqrt((metformin_sd_AST^2 + nonmetformin_sd_AST^2) / 2)
@@ -690,23 +773,31 @@ nonmetformin_sd_LFAT <- sd(matched1_nonmetformin$low_fat)
 metformin_sd_LFAT <- sqrt((metformin_sd_LFAT^2 + nonmetformin_sd_LFAT^2) / 2)
 smd_LFAT <- (metformin_mean_LFAT - nonmetformin_mean_LFAT) / metformin_sd_LFAT
 
+# Filter out 0 values from the AST column
+matched1_metformin$high_fat[matched1_metformin$high_fat == 0] <- NA
+matched1_nonmetformin$high_fat[matched1_nonmetformin$high_fat == 0] <- NA
+
 # liver Low fat matched mean and SD for metformin and nonmetformin :
 
-metformin_mean_MFAT <- mean(matched1_metformin$high_fat)
-metformin_sd_MFAT <- sd(matched1_metformin$high_fat)
-nonmetformin_mean_MFAT <- mean(matched1_nonmetformin$high_fat)
-nonmetformin_sd_MFAT <- sd(matched1_nonmetformin$high_fat)
+metformin_mean_MFAT <- mean(matched1_metformin$high_fat, na.rm = TRUE)
+metformin_sd_MFAT <- sd(matched1_metformin$high_fat, na.rm = TRUE)
+nonmetformin_mean_MFAT <- mean(matched1_nonmetformin$high_fat, na.rm = TRUE)
+nonmetformin_sd_MFAT <- sd(matched1_nonmetformin$high_fat, na.rm = TRUE)
 
 # Calculate pooled standard deviation for Low fat
 metformin_sd_MFAT <- sqrt((metformin_sd_MFAT^2 + nonmetformin_sd_MFAT^2) / 2)
 smd_MFAT <- (metformin_mean_MFAT - nonmetformin_mean_MFAT) / metformin_sd_MFAT
 
+# Filter out 0 values from the AST column
+matched1_metformin$Age_AC[matched1_metformin$Age_AC == 0] <- NA
+matched1_nonmetformin$Age_AC[matched1_nonmetformin$Age_AC == 0] <- NA
+
 # Age matched mean and SD :
 
-metformin_mean_age <- mean(matched1_metformin$Age_AC)
-matformin_sd_age <- sd(matched1_metformin$Age_AC)
-nonmetformin_mean_age <- mean(matched1_nonmetformin$Age_AC)
-nonmetformin_sd_age <- sd(matched1_nonmetformin$Age_AC)
+metformin_mean_age <- mean(matched1_metformin$Age_AC, na.rm = TRUE)
+matformin_sd_age <- sd(matched1_metformin$Age_AC, na.rm = TRUE)
+nonmetformin_mean_age <- mean(matched1_nonmetformin$Age_AC, na.rm = TRUE)
+nonmetformin_sd_age <- sd(matched1_nonmetformin$Age_AC, na.rm = TRUE)
 
 # BMI :
 nonmetformin_sd_age <- sqrt((matformin_sd_age^2 + nonmetformin_sd_age^2) / 2)
@@ -739,16 +830,34 @@ subset_count <- nrow(matched1_nonmetformin_MASLD)
 total_count <- nrow(matched1_nonmetformin)
 percentage <- (subset_count / total_count) * 100
 
-# matched Diabetes
-matched1_metformin_dianbetes <- subset(matched1_metformin)
-subset_count <- nrow(matched1_metformin_dianbetes)
-total_count <- nrow(matched1_nonmetformin)
-# Calculate the percentage
-percentage <- (subset_count / total_count) * 100
+# Diabetes percentage in mtforin patients:
 
-# Convert sample sizes to numeric
-matched1_n1_diabetes_numeric <- as.numeric(matched1_n1_diabetes)
-matched1_n2_diabetes_numeric <- as.numeric(matched1_n2_diabetes)
+metformin_diabetes_yes <- sum(matched1_metformin$Diabetes == 1, na.rm = TRUE)
+metformin_diabetes_no <- sum(matched1_metformin$Diabetes == 0, na.rm = TRUE)
+non_metformin_diabetes_yes <- sum(matched1_nonmetformin$Diabetes == 1, na.rm = TRUE)
+non_metformin_diabetes_no <- sum(matched1_nonmetformin$Diabetes == 0, na.rm = TRUE)
+
+# Calculate the sum of binary values for Diabetes being 1
+metformin_sum_diabetes1 <- sum(matched1_metformin$Diabetes, na.rm = TRUE)
+
+# Calculate the proportion of Diabetes 
+metformin_diabetes1 <- metformin_diabetes_yes / length(matched1_metformin$Diabetes)
+
+# Calculate the sample size for Diabetes being 1
+metformin_n1_diabetes <- sum(!is.na(matched1_metformin$Diabetes) & matched1_metformin$Diabetes == 1)
+
+# Calculate standardized mean difference (SMD) for Diabetes being 1
+metformin_smd_diabetes1 <- metformin_diabetes1
+
+# total number of diabetes individuals
+
+tl_ind <- metformin_diabetes_yes + metformin_diabetes_no
+tl_ind2 <- non_metformin_diabetes_yes + non_metformin_diabetes_no 
+
+# Calculate the percentage of individuals with and without diabetes:
+
+metformin_percent <- (metformin_diabetes_yes / tl_ind) * 100
+non_metformin_percent <- (non_metformin_diabetes_yes / tl_ind2) * 100
 
 # Calculate standardized mean difference (SMD) for Diabetes
 matched_smd_diabetes <- (matched_prop_diabetes1 - matched_prop_diabetes2) / sqrt((matched1_n1_diabetes_numeric * matched1_n2_diabetes_numeric) / (matched1_n1_diabetes_numeric + matched1_n2_diabetes_numeric))
@@ -779,7 +888,7 @@ matched1_female <- subset(matched1_nonmetformin, Gender == 0 & metformin == 0)
 subset_count <- nrow(matched1_female)
 # Calculate the total number of rows in matched1
 total_count2 <- nrow(matched1_nonmetformin)
-percentage <- (subset_count / total_count) * 100
+percentage <- (subset_count / total_count2) * 100
 
 # sum for gender of SMD. 
 matched1_gender1 <- sum(matched1$Gender == 0, na.rm = TRUE)
