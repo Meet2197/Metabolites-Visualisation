@@ -266,7 +266,7 @@ ggplot(forest_data2, aes(x = mean, y = treatment)) +
   labs(x = "Hazard Ratio", y = "Treatment", title = "Forest Plot of Pioglitazone Hazard Ratio") +  # Add title and axis labels
   theme_minimal() +
   theme(panel.grid = element_blank())
-
+# 
 # Kaplan Meier: 
 # Fit the Cox proportional hazards model:
 cox_model_sur <- coxph(Surv(epidiff, liverdisease) ~ death, data = all_hazard)
